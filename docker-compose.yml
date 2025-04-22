@@ -19,7 +19,7 @@ services:
       context: ./project
     container_name: reserva_frontend
     ports:
-      - "3030:5173"
+      - "3047:80"
     depends_on:
       - backend
     networks:
