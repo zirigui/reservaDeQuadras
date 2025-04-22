@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backEnd
+    container_name: reserva_backend
+    ports:
+      - "8000:8000"
+    networks:
+      - reserva_network
+
+  frontend:
+    build:
+      context: ./project
+    container_name: reserva_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - reserva_network
+
+networks:
+  reserva_network:
