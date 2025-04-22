@@ -1,15 +1,17 @@
-import React, { useState } from 'react';
-import { LogIn, Calendar, CheckCircle, XCircle, User, Clock, Mail } from 'lucide-react';
-import Login from './components/Login';
-import BookingScreen from './components/BookingScreen';
-import ConfirmationScreen from './components/ConfirmationScreen';
-import CancellationScreen from './components/CancellationScreen';
+import { useState } from 'react';
+import Login from './components/login/Login';
+import BookingScreen from './components/bookingscreen/BookingScreen';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState('login');
-  const [user, setUser] = useState(null);
-
-  const handleLogin = (userData) => {
+  const [user, setUser] = useState<User | null>(null);
+  const handleLogin = (userData: User) => {
     setUser(userData);
     setCurrentScreen('booking');
   };
@@ -18,15 +20,14 @@ function App() {
     switch (currentScreen) {
       case 'login':
         return <Login onLogin={handleLogin} />;
-      case 'booking':
-        return <BookingScreen onNavigate={setCurrentScreen} user={user} />;
-      case 'confirmation':
-        return <ConfirmationScreen onNavigate={setCurrentScreen} user={user} />;
-      case 'cancellation':
-        return <CancellationScreen onNavigate={setCurrentScreen} user={user} />;
-      default:
-        return <Login onLogin={handleLogin} />;
-    }
+        case 'booking':
+          if (!user) {
+            return <div>Você precisa estar logado para acessar esta tela.</div>;
+          }
+          return <BookingScreen onNavigate={setCurrentScreen} user={user} />;
+        default:
+          return <Login onLogin={handleLogin} />;
+      }
   };
 
   return (
