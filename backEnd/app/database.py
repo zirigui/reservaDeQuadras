@@ -7,10 +7,10 @@ import os
 def get_db_connection():
     try:
         conn = psycopg2.connect(
-            dbname="postgres",
+            dbname="reservas",
             user="postgres",
             password="postgres",
-            host="localhost",
+            host="200.132.38.218",
             port="5432",
             options="-c client_encoding=UTF8"  # Força a codificação para UTF-8
         )

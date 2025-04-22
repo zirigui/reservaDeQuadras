@@ -23,6 +23,8 @@ interface LoginProps {
   onLogin: (userData: UserData) => void;
 }
 
+const backendUrl = process.env.REACT_APP_API_URL
+
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +33,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     e.preventDefault();
   
     try {
-      const response = await fetch('http://localhost:8000/auth/login', {
+      const response = await fetch(`${backendUrl}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

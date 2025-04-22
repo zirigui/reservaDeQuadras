@@ -45,6 +45,8 @@ interface BookingScreenProps {
   user: User;
 }
 
+const backendUrl = process.env.REACT_APP_API_URL
+
 const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
@@ -71,7 +73,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
 
     try {
       const token = localStorage.getItem('token'); // ou onde estiver guardado
-      const response = await fetch('http://localhost:8000/reserva', {
+      const response = await fetch(`${backendUrl}/reserva`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

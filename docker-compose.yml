@@ -6,20 +6,42 @@ services:
       context: ./backEnd
     container_name: reserva_backend
     ports:
-      - "8000:8000"
+      - "1689:8000"
     networks:
       - reserva_network
+    environment:
+      - DATABASE_URL=postgres://user:password@db:5432/reservas
+    depends_on:
+      - db
 
   frontend:
     build:
       context: ./project
     container_name: reserva_frontend
     ports:
-      - "3000:80"
+      - "3030:5173"
     depends_on:
       - backend
     networks:
       - reserva_network
 
+  db:
+    image: postgres:latest
+    container_name: reserva_db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: reservas
+    ports:
+      - "5438:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - reserva_network
+
 networks:
   reserva_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
