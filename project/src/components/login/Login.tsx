@@ -23,7 +23,7 @@ interface LoginProps {
   onLogin: (userData: UserData) => void;
 }
 
-const backendUrl = process.env.REACT_APP_API_URL
+const backendUrl = import.meta.env.VITE_API_URL
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const [email, setEmail] = useState('');

@@ -45,7 +45,7 @@ interface BookingScreenProps {
   user: User;
 }
 
-const backendUrl = process.env.REACT_APP_API_URL
+const backendUrl = import.meta.env.VITE_API_URL
 
 const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
