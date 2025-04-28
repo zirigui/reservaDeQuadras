@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LogIn, Mail, Lock } from 'lucide-react';
+
 import {
   Container,
   Card,
@@ -10,7 +11,7 @@ import {
   IconWrapper,
   Input,
   Button,
-  } from './loginStyles';
+} from './loginStyles';
 
 interface UserData {
   id: string;
@@ -56,6 +57,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       alert('Erro de conexão com o servidor');
       console.error(error);
     }
+  };
+
+  const handleRegisterClick = () => {
+    window.location.href = '/register';
   };
 
   return (
@@ -104,6 +109,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
           <Button type="submit">Entrar</Button>
         </form>
+
+        <Button type="button" onClick={handleRegisterClick} style={{ marginTop: '10px', backgroundColor: '#4f46e5' }}>
+          Cadastrar-se
+        </Button>
       </Card>
     </Container>
   );

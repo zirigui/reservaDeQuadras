@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
@@ -14,6 +14,7 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     password = Column(String)
     email = Column(String)
+    admin = Column(Boolean, default=False)
 
 class Reserva(Base):
     __tablename__ = "reservas"
@@ -22,4 +23,3 @@ class Reserva(Base):
     horario = Column(DateTime)
 
 Base.metadata.create_all(bind=engine)
-
