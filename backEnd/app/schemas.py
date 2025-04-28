@@ -9,6 +9,7 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     username: str
     password: str
+    admin: bool
 
 class Reserva(BaseModel):
     quadra: str

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { LogIn, Mail, Lock } from 'lucide-react';
-
+import { UserPlus, Mail, Lock, User } from 'lucide-react';
 import {
   Container,
   Card,
@@ -11,47 +10,39 @@ import {
   IconWrapper,
   Input,
   Button,
-} from './loginStyles';
+} from './registerStyles';
 
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-  access_token: string;
-}
+const backendUrl = import.meta.env.VITE_API_URL;
 
-interface LoginProps {
-  onLogin: (userData: UserData) => void;
-}
-
-const backendUrl = import.meta.env.VITE_API_URL
-
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Register: React.FC = () => {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     try {
-      const response = await fetch(`${backendUrl}/auth/login`, {
+      const response = await fetch(`${backendUrl}/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          username: email,
+          name,
+          email,
           password,
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
-        localStorage.setItem('token', data.access_token);
-        onLogin(data);
+        alert('Cadastro realizado com sucesso!');
+        // Após cadastro, redireciona para login
+        window.location.href = '/login';
       } else {
-        alert(data.detail || 'Erro ao fazer login');
+        alert(data.detail || 'Erro ao fazer cadastro');
       }
     } catch (error) {
       alert('Erro de conexão com o servidor');
@@ -59,22 +50,34 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     }
   };
 
-  const handleRegisterClick = () => {
-    window.location.href = '/register';
-  };
-
   return (
     <Container>
       <Card>
         <Header>
           <IconContainer>
-            <LogIn className="w-8 h-8 text-indigo-600" />
+            <UserPlus className="w-8 h-8 text-indigo-600" />
           </IconContainer>
-          <h2>Bem-vindo</h2>
-          <p>Faça login para agendar sua quadra</p>
+          <h2>Crie sua conta</h2>
+          <p>Cadastre-se para agendar sua quadra</p>
         </Header>
 
         <form onSubmit={handleSubmit}>
+          <InputGroup>
+            <label>Nome</label>
+            <InputWrapper>
+              <IconWrapper>
+                <User className="h-5 w-5 text-gray-400" />
+              </IconWrapper>
+              <Input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Seu nome completo"
+                required
+              />
+            </InputWrapper>
+          </InputGroup>
+
           <InputGroup>
             <label>Email</label>
             <InputWrapper>
@@ -107,15 +110,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             </InputWrapper>
           </InputGroup>
 
-          <Button type="submit">Entrar</Button>
+          <Button type="submit">Cadastrar</Button>
         </form>
-
-        <Button type="button" onClick={handleRegisterClick} style={{ marginTop: '10px', backgroundColor: '#4f46e5' }}>
-          Cadastrar-se
-        </Button>
       </Card>
     </Container>
   );
 };
 
-export default Login;
+export default Register;
