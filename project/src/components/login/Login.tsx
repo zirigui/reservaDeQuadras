@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LogIn, Mail, Lock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import {
   Container,
@@ -27,6 +28,7 @@ interface LoginProps {
 const backendUrl = import.meta.env.VITE_API_URL
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
@@ -50,6 +52,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       if (response.ok) {
         localStorage.setItem('token', data.access_token);
         onLogin(data);
+        navigate('/booking');
       } else {
         alert(data.detail || 'Erro ao fazer login');
       }
