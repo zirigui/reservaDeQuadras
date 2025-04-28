@@ -6,7 +6,7 @@ from typing import Optional
 router = APIRouter()
 
 @router.post("/reserva")
-def criar_reserva(reserva: schemas.ReservaCreate, user=Depends()):
+def criar_reserva(reserva: schemas.Reserva, user=Depends()):
     conn = database.get_db_connection()
     try:
         # Inserindo a reserva no banco

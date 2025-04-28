@@ -1,25 +1,16 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from pydantic import BaseModel
+from datetime import datetime
 
-DATABASE_URL = "postgresql://postgres:password@db:5432/reservas"
+class UserCreate(BaseModel):
+    username: str
+    password: str
+    email: str
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+class UserLogin(BaseModel):
+    username: str
+    password: str
 
-class User(Base):
-    __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    password = Column(String)
-    email = Column(String)
-
-class Reserva(Base):
-    __tablename__ = "reservas"
-    id = Column(Integer, primary_key=True, index=True)
-    quadra = Column(String)
-    horario = Column(DateTime)
-
-Base.metadata.create_all(bind=engine)
-
+class Reserva(BaseModel):
+    quadra: str
+    horario: datetime
+    user_id: int

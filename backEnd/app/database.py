@@ -10,8 +10,8 @@ def get_db_connection():
             dbname="reservas",
             user="postgres",
             password="password",
-            host="db",
-            port="5432",
+            host="localhost",
+            port="5438",
             options="-c client_encoding=UTF8"  # Força a codificação para UTF-8
         )
         return conn
