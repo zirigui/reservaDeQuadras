@@ -20,7 +20,7 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <Routes>
-          <Route path="/login" element={<Login onLogin={handleLogin} />} />
+          <Route path="/" element={<Login onLogin={handleLogin} />} />
           <Route
             path="/booking"
             element={user ? <BookingScreen user={user} onNavigate={(screen, data) => console.log(screen, data)} /> : <div>Você precisa estar logado para acessar esta tela.</div>}
