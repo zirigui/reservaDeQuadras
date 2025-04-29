@@ -38,7 +38,7 @@ def login(user: schemas.UserLogin):
         with conn.cursor() as cur:
             cur.execute("SELECT id, username, password, email, admin FROM users WHERE email = %s", (user.email,))
             db_user = cur.fetchone()
-            if not db_user or not auth.verify_password(user.password, db_user[3]):  # db_user[2] é a senha
+            if not db_user or not auth.verify_password(user.password, db_user[2]):  # db_user[2] é a senha
                 raise HTTPException(status_code=401, detail="Credenciais inválidas")
 
             token_data = {
