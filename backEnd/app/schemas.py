@@ -11,5 +11,5 @@ class UserLogin(BaseModel):
     password: str
 
 class Reserva(BaseModel):
-    quadra: str
+    quadra: int
     horario: datetime
