@@ -52,7 +52,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       if (response.ok) {
         localStorage.setItem('token', data.access_token);
         onLogin(data);
-        navigate('/booking');
+        navigate('/');
       } else {
         alert(data.detail || 'Erro ao fazer login');
       }

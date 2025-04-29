@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'
 import Login from './components/login/Login';
 import BookingScreen from './components/bookingscreen/BookingScreen';
 import Register from './components/register/Register';
@@ -20,10 +20,10 @@ function App() {
     <Router>
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
         <Routes>
-          <Route path="/" element={<Login onLogin={handleLogin} />} />
+          <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route
-            path="/booking"
-            element={user ? <BookingScreen user={user} onNavigate={(screen, data) => console.log(screen, data)} /> : <div>Você precisa estar logado para acessar esta tela.</div>}
+            path="/"
+            element={user ? <BookingScreen user={user} onNavigate={(screen, data) => console.log(screen, data)} /> : <Navigate to="/login" />}
           />
           <Route path='/register' element={<Register />} />
         </Routes>

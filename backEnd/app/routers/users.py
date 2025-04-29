@@ -5,6 +5,7 @@ router = APIRouter()
 
 @router.post("/register")
 def register(user: schemas.UserCreate):
+    print(user)
     conn = database.get_db_connection()
     conn.set_client_encoding('UTF8')
     try:
@@ -35,9 +36,9 @@ def login(user: schemas.UserLogin):
     conn = database.get_db_connection()
     try:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, username, password, email, admin FROM users WHERE username = %s", (user.username,))
+            cur.execute("SELECT id, username, password, email, admin FROM users WHERE username = %s", (user.email,))
             db_user = cur.fetchone()
-            if not db_user or not auth.verify_password(user.password, db_user[2]):  # db_user[2] é a senha
+            if not db_user or not auth.verify_password(user.password, db_user[3]):  # db_user[2] é a senha
                 raise HTTPException(status_code=401, detail="Credenciais inválidas")
 
             token_data = {
