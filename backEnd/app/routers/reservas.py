@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
-from sqlalchemy.orm import Session
-from .. import models, schemas, database, auth
-from typing import Optional
+from .. import models, schemas, database
+from auth import get_current_user
 
 router = APIRouter()
 
 @router.post("/reserva")
-def criar_reserva(reserva: schemas.Reserva, user=Depends()):
+def criar_reserva(reserva: schemas.Reserva, current_user: dict = Depends(get_current_user)):
     conn = database.get_db_connection()
     try:
         # Inserindo a reserva no banco
@@ -14,7 +13,7 @@ def criar_reserva(reserva: schemas.Reserva, user=Depends()):
             cur.execute("""
                 INSERT INTO reservas (quadra, horario, user_id) 
                 VALUES (%s, %s, %s) RETURNING id
-            """, (reserva.quadra, reserva.horario, user.id))
+            """, (reserva.quadra, reserva.horario, current_user["id"]))
             reserva_id = cur.fetchone()[0]
             conn.commit()
 

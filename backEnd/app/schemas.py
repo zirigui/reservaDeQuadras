@@ -13,4 +13,3 @@ class UserLogin(BaseModel):
 class Reserva(BaseModel):
     quadra: str
     horario: datetime
-    user_id: int
