@@ -80,7 +80,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
           Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
-          quadra_id: selectedCourt.id,
+          quadra: selectedCourt.id,
           horario: horarioISO
         })
       });
