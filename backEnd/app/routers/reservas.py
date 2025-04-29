@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
 from .. import models, schemas, database
-from auth import get_current_user
+from ..auth import get_current_user
 
 router = APIRouter()
 
