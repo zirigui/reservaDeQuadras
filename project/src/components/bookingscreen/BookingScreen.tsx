@@ -1,23 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Container,
-  Card,
-  Header,
-  Title,
-  DateContainer,
-  Content,
-  CourtName,
-  CourtType,
-  CourtSection,
-  CourtButton,
-  SelectedIndicator,
-  CourtList,
-  SectionTitle,
-  TimeSection,
-  TimeButton,
-  TimeGrid,
-  ActionButtonContainer,
-  ActionButton
+  Container, Card, Header, Title,
+  DateContainer, Content, CourtName,
+  CourtType, CourtSection, CourtButton,
+  SelectedIndicator, CourtList, SectionTitle,
+  TimeSection, TimeButton, TimeGrid,
+  ActionButtonContainer, ActionButton
 } from './bookingScreenStyles';
 
 interface Court {
@@ -49,12 +37,21 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
+  const [courts, setCourts] = useState<Court[]>([]);
 
-  const courts: Court[] = [
-    { id: 1, name: 'Quadra 1', type: 'Futsal' },
-    { id: 2, name: 'Quadra 2', type: 'Vôlei' },
-    { id: 3, name: 'Quadra 3', type: 'Basquete' },
-  ];
+  // Carregar quadras do backend
+  useEffect(() => {
+    const loadCourts = async () => {
+      const token = localStorage.getItem('token');
+      const res = await fetch(`${backendUrl}/quadras`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      setCourts(data);
+    };
+
+    loadCourts();
+  }, []);
 
   const timeSlots = [
     '08:00', '09:00', '10:00', '11:00', '12:00',
@@ -70,7 +67,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
     ).toISOString();
 
     try {
-      const token = localStorage.getItem('token'); // ou onde estiver guardado
+      const token = localStorage.getItem('token');
       const response = await fetch(`${backendUrl}/reserva`, {
         method: 'POST',
         headers: {
@@ -100,7 +97,6 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   };
 
   return (
-    <div style={{ display: 'flex' }}>
     <Container>
       <Card>
         <Header>
@@ -160,7 +156,6 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
         </ActionButtonContainer>
       </Card>
     </Container>
-    </div>
   );
 };
 

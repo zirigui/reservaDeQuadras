@@ -1,88 +1,65 @@
-import React, { useState, useEffect } from 'react'
-import {
-  Container, Card, Header, Title,
-  Content, Form, Input, Select,
-  Button, List, ListItem, ActionGroup
-} from './adminStyles'
+import React, { useState, useEffect } from 'react';
+import { CourtCardContainer, CourtCard, CardContent, ActionGroup, Button } from './adminStyles';
 
-const backendUrl = import.meta.env.VITE_API_URL
+interface Court {
+  id: number;
+  name: string;
+  type: string;
+}
 
-
-interface Court { id: number; name: string; type: string }
+const backendUrl = import.meta.env.VITE_API_URL;
 
 const AdminScreen: React.FC = () => {
-  const [courts, setCourts] = useState<Court[]>([])
-  const [name, setName] = useState('')
-  const [type, setType] = useState('Futsal')
-  const [editing, setEditing] = useState<Court | null>(null)
-  const token = localStorage.getItem('token')
+  const [courts, setCourts] = useState<Court[]>([]);
 
-  const load = () => {
-    fetch(`${backendUrl}/quadras`, { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json()).then(setCourts)
-  }
-  useEffect(load, [])
+  const loadCourts = async () => {
+    try {
+      const response = await fetch(`${backendUrl}/quadras`);
+      const data = await response.json();
+      setCourts(data);
+    } catch (error) {
+      console.error('Erro ao carregar quadras:', error);
+    }
+  };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    const method = editing ? 'PUT' : 'POST'
-    const url = editing
-      ? `${backendUrl}/quadras/${editing.id}`
-      : `${backendUrl}/quadras`
-    const res = await fetch(url, {
-      method, headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({ name, type })
-    })
-    if (!res.ok) return alert('Erro ao salvar')
-    setName(''); setType('Futsal'); setEditing(null)
-    load()
-  }
+  useEffect(() => {
+    loadCourts();
+  }, []);
 
-  const handleEdit = (c: Court) => {
-    setEditing(c); setName(c.name); setType(c.type)
-  }
+  const handleEdit = (court: Court) => {
+    // Função para editar a quadra
+    alert(`Editar quadra: ${court.name}`);
+  };
+
   const handleDelete = async (id: number) => {
-    if (!confirm('Excluir quadra?')) return
-    await fetch(`${backendUrl}/quadras/${id}`, {
-      method: 'DELETE',
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    load()
-  }
+    if (!confirm('Tem certeza que deseja excluir esta quadra?')) return;
+
+    try {
+      await fetch(`${backendUrl}/quadras/${id}`, {
+        method: 'DELETE',
+      });
+      loadCourts(); // Recarrega a lista de quadras
+    } catch (error) {
+      console.error('Erro ao excluir quadra:', error);
+    }
+  };
 
   return (
-    <Container>
-      <Card>
-        <Header><Title>Administração de Quadras</Title></Header>
-        <Content>
-          <Form onSubmit={handleSubmit}>
-            <label>Nome</label>
-            <Input value={name} onChange={e => setName(e.target.value)} required />
-            <label>Tipo</label>
-            <Select value={type} onChange={e => setType(e.target.value)}>
-              <option>Futsal</option>
-              <option>Vôlei</option>
-              <option>Basquete</option>
-            </Select>
-            <Button type="submit">{editing ? 'Atualizar' : 'Cadastrar'}</Button>
-          </Form>
-          <List>
-            {courts.map(c => (
-              <ListItem key={c.id}>
-                {c.name} — {c.type}
-                <ActionGroup>
-                  <Button onClick={() => handleEdit(c)}>✏️</Button>
-                  <Button onClick={() => handleDelete(c.id)}>🗑️</Button>
-                </ActionGroup>
-              </ListItem>
-            ))}
-          </List>
-        </Content>
-      </Card>
-    </Container>
-  )
-}
-export default AdminScreen
+    <CourtCardContainer>
+      {courts.map((court) => (
+        <CourtCard key={court.id}>
+          <CardContent>
+            <h3>{court.name}</h3>
+            <p>{court.type}</p>
+          </CardContent>
+          <ActionGroup>
+            <Button onClick={() => handleEdit(court)}>✏️ Editar</Button>
+            <Button onClick={() => handleDelete(court.id)}>🗑️ Excluir</Button>
+          </ActionGroup>
+        </CourtCard>
+      ))}
+    </CourtCardContainer>
+  );
+};
+
+export default AdminScreen;

@@ -92,3 +92,35 @@ export const ActionGroup = styled.div`
   display: flex;
   gap: 0.5rem;
 `;
+
+export const CourtCardContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 16px;
+`;
+
+export const CourtCard = styled.div`
+  background: #fff;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
+export const CardContent = styled.div`
+  text-align: center;
+
+  h3 {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+  }
+
+  p {
+    color: #666;
+  }
+`;
+
