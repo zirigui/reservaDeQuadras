@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CourtCardContainer, CourtCard, CardContent, ActionGroup, Button, Form, Input, Label } from './adminStyles';
+import Modal from '../modal/returnModal'
 
 interface Court {
   id: number;
@@ -13,6 +14,8 @@ const AdminScreen: React.FC = () => {
   const [courts, setCourts] = useState<Court[]>([]);
   const [newCourtName, setNewCourtName] = useState<string>('');
   const [newCourtType, setNewCourtType] = useState<string>('');
+  const [showModal, setShowModal] = useState<boolean>(false);  // Estado para controlar a exibição do modal
+  const [modalMessage, setModalMessage] = useState<string>('');  // Mensagem do modal
   const token = localStorage.getItem('token');
 
   const loadCourts = async () => {
@@ -75,11 +78,20 @@ const AdminScreen: React.FC = () => {
         setNewCourtName('');
         setNewCourtType('');
         loadCourts(); // Recarrega a lista de quadras após adicionar
+        setModalMessage('Quadra cadastrada com sucesso!');
+        setShowModal(true); // Exibe o modal
       } else {
         console.error('Erro ao adicionar quadra');
       }
     } catch (error) {
       console.error('Erro ao adicionar quadra:', error);
+    }
+  };
+
+  const handleModalClose = (result: boolean) => {
+    setShowModal(false);
+    if (result) {
+      console.log('Ação confirmada: Quadra cadastrada');
     }
   };
 
@@ -128,6 +140,10 @@ const AdminScreen: React.FC = () => {
           ))
         )}
       </CourtCardContainer>
+
+      {showModal && (
+        <Modal message={modalMessage} onClose={handleModalClose} />
+      )}
     </div>
   );
 };
