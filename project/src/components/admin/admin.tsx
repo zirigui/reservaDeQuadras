@@ -13,6 +13,7 @@ const AdminScreen: React.FC = () => {
   const [courts, setCourts] = useState<Court[]>([]);
   const [newCourtName, setNewCourtName] = useState<string>('');
   const [newCourtType, setNewCourtType] = useState<string>('');
+  const token = localStorage.getItem('token');
 
   const loadCourts = async () => {
     try {
@@ -62,6 +63,7 @@ const AdminScreen: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
         },
         body: JSON.stringify({
           name: newCourtName,
