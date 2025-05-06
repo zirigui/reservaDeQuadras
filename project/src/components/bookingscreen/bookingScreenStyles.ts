@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 export const Container = styled.div`
+  flex: 1;  
   min-height: 100vh;
   padding: 1.5rem;
 `;
@@ -134,4 +135,6 @@ export const ActionButton = styled.button<{ disabled: boolean }>`
   &:hover {
     background-color: ${(props) => (props.disabled ? '#4F46E5' : '#4338CA')};
   }
+
+
 `;

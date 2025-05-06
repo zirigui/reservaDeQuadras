@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Calendar } from 'lucide-react';
+import Sidebar from '../sidebar/Sidebar';
 import {
   Container,
   Card,
   Header,
   Title,
   DateContainer,
-  DateText,
   Content,
   CourtName,
   CourtType,
@@ -102,13 +101,13 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   };
 
   return (
+    <div style={{ display: 'flex' }}>
+    <Sidebar onNavigate={onNavigate} />
     <Container>
       <Card>
         <Header>
           <Title>Agendar Quadra</Title>
           <DateContainer>
-            <Calendar className="w-6 h-6 text-indigo-600" />
-            <DateText>{selectedDate.toLocaleDateString('pt-BR')}</DateText>
             <input
               type="date"
               value={selectedDate.toISOString().split('T')[0]}
@@ -163,6 +162,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
         </ActionButtonContainer>
       </Card>
     </Container>
+    </div>
   );
 };
 
