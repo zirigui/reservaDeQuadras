@@ -13,3 +13,15 @@ class UserLogin(BaseModel):
 class Reserva(BaseModel):
     quadra: int
     horario: datetime
+
+class QuadraBase(BaseModel):
+    name: str
+    type: str
+
+class QuadraCreate(QuadraBase):
+    pass
+
+class Quadra(QuadraBase):
+    id: int
+    class Config:
+        orm_mode = True
