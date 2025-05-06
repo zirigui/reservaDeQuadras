@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Sidebar from '../sidebar/Sidebar';
 import {
   Container,
   Card,
@@ -102,7 +101,6 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
 
   return (
     <div style={{ display: 'flex' }}>
-    <Sidebar onNavigate={onNavigate} />
     <Container>
       <Card>
         <Header>

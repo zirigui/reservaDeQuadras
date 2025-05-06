@@ -11,6 +11,8 @@ interface User {
   email: string;
 }
 
+
+
 function App() {
   const [user, setUser] = useState<User | null>(null);
 
@@ -42,28 +44,41 @@ function App() {
 
   return (
     <Router>
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex">
-        {user && <Sidebar onNavigate={handleNavigate} />}
-
-        <div className="flex-1 p-4">
-          <Routes>
-            <Route path="/login" element={<Login onLogin={handleLogin} />} />
-            <Route
-              path="/"
-              element={
-                user ? (
-                  <BookingScreen user={user} onNavigate={() => {}} />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              }
-            />
-            <Route path="/register" element={<Register />} />
-          </Routes>
+      {user ? (
+        // Layout para usuários autenticados
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex">
+          <Sidebar onNavigate={handleNavigate} />
+          <div className="flex-1 p-4">
+            <Routes>
+              <Route
+                path="/"
+                element={<BookingScreen user={user} onNavigate={() => {}} />}
+              />
+              <Route
+                path="/my-bookings"
+                element={<div>Meus Agendamentos (placeholder)</div>}
+              />
+              <Route
+                path="/replays"
+                element={<div>Replays (placeholder)</div>}
+              />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </div>
         </div>
-      </div>
+      ) : (
+        // Layout para usuários não autenticados
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+          <div className="w-full max-w-md p-4">
+            <Routes>
+              <Route path="/login" element={<Login onLogin={handleLogin} />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="*" element={<Navigate to="/login" />} />
+            </Routes>
+          </div>
+        </div>
+      )}
     </Router>
-  );
+  );  
 }
-
 export default App;
