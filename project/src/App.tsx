@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/login/Login';
 import BookingScreen from './components/bookingscreen/BookingScreen';
 import Register from './components/register/Register';
-import Sidebar from './components/sidebar/Sidebar'; 
+import Sidebar from './components/sidebar/Sidebar';
+import AdminScreen from './components/admin/admin';
 
 interface User {
   id: string;
@@ -40,6 +41,7 @@ function App() {
     if (screen === 'booking') window.location.href = '/';
     if (screen === 'myBookings') window.location.href = '/my-bookings';
     if (screen === 'replays') window.location.href = '/replays';
+    if (screen === 'admin') window.location.href = '/admin'
   };
 
   return (
@@ -53,6 +55,10 @@ function App() {
               <Route
                 path="/"
                 element={<BookingScreen user={user} onNavigate={() => {}} />}
+              />
+              <Route
+                path="/admin"
+                element={<AdminScreen />}
               />
               <Route
                 path="/my-bookings"

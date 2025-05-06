@@ -12,6 +12,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
   return (
     <SidebarContainer>
+      <MenuItem onClick={() => onNavigate('admin')}>Admin</MenuItem>
       <MenuItem onClick={() => onNavigate('booking')}>Reservar quadra</MenuItem>
       <MenuItem onClick={() => onNavigate('myBookings')}>Meus agendamentos</MenuItem>
       <MenuItem onClick={() => onNavigate('replays')}>Replays</MenuItem>
