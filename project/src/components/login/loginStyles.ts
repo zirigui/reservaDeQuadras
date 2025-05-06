@@ -34,11 +34,12 @@ export const Header = styled.div`
 `;
 
 export const IconContainer = styled.div`
-  background-color: #e0e7ff; // indigo-100
   padding: 0.75rem;
-  border-radius: 9999px;
-  display: inline-block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
+
 
 export const InputGroup = styled.div`
   margin-bottom: 1.5rem;
@@ -87,7 +88,7 @@ export const Button = styled.button`
   display: flex;
   justify-content: center;
   padding: 0.75rem 1rem;
-  background-color: #4f46e5; // indigo-600
+  background-color: #1d5a27; // indigo-600
   color: white;
   font-size: 0.875rem; // text-sm
   font-weight: 500;
@@ -98,11 +99,11 @@ export const Button = styled.button`
   transition: background-color 0.2s;
 
   &:hover {
-    background-color: #4338ca; // indigo-700
+    background-color:rgb(6, 110, 24); // indigo-700
   }
 
   &:focus {
     outline: none;
-    ring: 2px solid #6366f1; // indigo-500
+    ring: 2px solidrgb(83, 243, 109); // indigo-500
   }
 `;

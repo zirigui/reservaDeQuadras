@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { LogIn, Mail, Lock } from 'lucide-react';
+import {  Mail, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -71,7 +71,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       <Card>
         <Header>
           <IconContainer>
-            <LogIn className="w-8 h-8 text-indigo-600" />
+          <img src="/logo.png" alt="Logo" className="w-32 h-32 object-contain" />
           </IconContainer>
           <h2>Bem-vindo</h2>
           <p>Faça login para agendar sua quadra</p>
@@ -113,7 +113,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           <Button type="submit">Entrar</Button>
         </form>
 
-        <Button type="button" onClick={handleRegisterClick} style={{ marginTop: '10px', backgroundColor: '#4f46e5' }}>
+        <Button type="button" onClick={handleRegisterClick} style={{ marginTop: '10px', backgroundColor: '#1d5a27' }}>
           Cadastrar-se
         </Button>
       </Card>

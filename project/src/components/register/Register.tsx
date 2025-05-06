@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserPlus, Mail, Lock, User } from 'lucide-react';
+import {  Mail, Lock, User } from 'lucide-react';
 import {
   Container,
   Card,
@@ -55,7 +55,7 @@ const Register: React.FC = () => {
       <Card>
         <Header>
           <IconContainer>
-            <UserPlus className="w-8 h-8 text-indigo-600" />
+          <img src="/logo.png" alt="Logo" className="w-32 h-32 object-contain" />
           </IconContainer>
           <h2>Crie sua conta</h2>
           <p>Cadastre-se para agendar sua quadra</p>
