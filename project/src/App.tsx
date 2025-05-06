@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './components/login/Login';
 import BookingScreen from './components/bookingscreen/BookingScreen';
 import Register from './components/register/Register';
@@ -72,7 +72,6 @@ function App() {
             <Routes>
               <Route path="/login" element={<Login onLogin={handleLogin} />} />
               <Route path="/register" element={<Register />} />
-              <Route path="*" element={<Navigate to="/login" />} />
             </Routes>
           </div>
         </div>
