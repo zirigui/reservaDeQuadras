@@ -62,7 +62,6 @@ function App() {
                 path="/replays"
                 element={<div>Replays (placeholder)</div>}
               />
-              <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </div>
         </div>
