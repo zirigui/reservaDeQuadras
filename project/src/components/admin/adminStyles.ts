@@ -33,20 +33,6 @@ export const Content = styled.div`
   gap: 2rem;
 `;
 
-export const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-`;
-
-export const Input = styled.input`
-  padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db; // gray-300
-  border-radius: 0.75rem;
-  font-size: 1rem;
-  color: #111827; // gray-900
-`;
-
 export const Select = styled.select`
   padding: 0.75rem 1rem;
   border: 1px solid #d1d5db;
@@ -54,22 +40,6 @@ export const Select = styled.select`
   font-size: 1rem;
   color: #111827;
   background-color: white;
-`;
-
-export const Button = styled.button`
-  padding: 0.75rem 1.5rem;
-  background-color: #4F46E5; // indigo-600
-  color: white;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 0.75rem;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s;
-
-  &:hover {
-    background-color: #4338CA; // indigo-700
-  }
 `;
 
 export const List = styled.ul`
@@ -123,4 +93,36 @@ export const CardContent = styled.div`
     color: #666;
   }
 `;
+
+export const Form = styled.form`
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+`;
+
+export const Input = styled.input`
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+`;
+
+export const Label = styled.label`
+  font-size: 14px;
+  margin-bottom: 6px;
+`;
+
+export const Button = styled.button`
+  padding: 10px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #45a049;
+  }
+`;
+
 
