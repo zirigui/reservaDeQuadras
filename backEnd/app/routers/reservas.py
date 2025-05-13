@@ -30,7 +30,7 @@ def listar_reservas(current_user: dict = Depends(get_current_user)):
     try:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT r.id, r.horario, q.name as quadra, r.horario - NOW() > INTERVAL '24 hours' AS pode_cancelar
+                SELECT r.id, r.horario, q.name as quadra, r.horario - NOW() < INTERVAL '24 hours' AS pode_cancelar
                 FROM reservas r
                 JOIN quadras q ON r.quadra = q.id
                 WHERE r.user_id = %s
