@@ -5,6 +5,7 @@ import BookingScreen from './components/bookingscreen/BookingScreen';
 import Register from './components/register/Register';
 import Sidebar from './components/sidebar/Sidebar';
 import AdminScreen from './components/admin/admin';
+import CancellationScreen from './components/cancelationScreen/CancelationScreen';
 
 interface User {
   id: string;
@@ -62,7 +63,11 @@ function App() {
               />
               <Route
                 path="/my-bookings"
-                element={<div>Meus Agendamentos (placeholder)</div>}
+                element={<CancellationScreen
+                    onNavigate={handleNavigate}
+                    user={user} 
+                    />
+                  }
               />
               <Route
                 path="/replays"

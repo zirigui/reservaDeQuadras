@@ -1,5 +1,6 @@
-/*import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, XCircle, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Container,
   Wrapper,
@@ -18,31 +19,67 @@ import {
   EmptyText
 } from './cancelationScreenStyles';
 
-interface CancellationScreenProps {
-  onNavigate: (screen: string) => void;
-  user: any;
+interface Reservation {
+  id: number;
+  date: string;
+  time: string;
+  court: string;
+  canCancel: boolean;
+}
+interface User {
+  id: string;
+  name: string;
+  email: string;
 }
 
-const CancellationScreen: React.FC<CancellationScreenProps> = ({ onNavigate, user }) => {
-  const reservations = [
-    {
-      id: 1,
-      date: '15/03/2024',
-      time: '14:00 - 15:00',
-      court: 'Quadra 1 - Futsal',
-      canCancel: true,
-    },
-    {
-      id: 2,
-      date: '20/03/2024',
-      time: '16:00 - 17:00',
-      court: 'Quadra 2 - Vôlei',
-      canCancel: true,
-    },
-  ];
+interface CancellationScreenProps {
+  onNavigate: (screen: string) => void;
+  user: User;
+}
 
-  const handleCancel = (id: number) => {
-    alert('Reserva cancelada com sucesso!');
+const backendUrl = import.meta.env.VITE_API_URL;
+
+const CancellationScreen: React.FC<CancellationScreenProps> = ({ onNavigate }) => {
+  const [reservations, setReservations] = useState<Reservation[]>([]);
+  const token = localStorage.getItem('token');
+
+  // 1. Carrega reservas do usuário
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res = await fetch(`${backendUrl}/reservas`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+        setReservations(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Erro ao carregar reservas:', err);
+      }
+    };
+    load();
+  }, [token]);
+
+  // 2. Cancela reserva e anima remoção
+  const handleCancel = async (id: number) => {
+    if (!confirm('Tem certeza que deseja cancelar esta reserva?')) return;
+
+    try {
+      const res = await fetch(`${backendUrl}/reserva/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        // dispara animação de saída
+        setReservations((prev) => prev.filter((r) => r.id !== id));
+      } else {
+        const err = await res.json();
+        alert(`Erro: ${err.detail}`);
+      }
+    } catch (err) {
+      console.error('Erro ao cancelar reserva:', err);
+      alert('Erro ao cancelar reserva');
+    }
   };
 
   return (
@@ -56,42 +93,51 @@ const CancellationScreen: React.FC<CancellationScreenProps> = ({ onNavigate, use
         </Header>
 
         {reservations.length > 0 ? (
-          <>
+          <AnimatePresence>
             {reservations.map((reservation) => (
-              <ReservationCard key={reservation.id}>
-                <CardRow>
-                  <InfoGroup>
-                    <Calendar size={20} color="#6b7280" />
-                    <span style={{ fontWeight: 500 }}>{reservation.date}</span>
-                  </InfoGroup>
-                  <InfoGroup>
-                    <Clock size={20} color="#6b7280" />
-                    <span>{reservation.time}</span>
-                  </InfoGroup>
-                </CardRow>
+              <motion.div
+                key={reservation.id}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                style={{ overflow: 'hidden' }}
+              >
+                <ReservationCard>
+                  <CardRow>
+                    <InfoGroup>
+                      <Calendar size={20} color="#6b7280" />
+                      <span style={{ fontWeight: 500 }}>{reservation.date}</span>
+                    </InfoGroup>
+                    <InfoGroup>
+                      <Clock size={20} color="#6b7280" />
+                      <span>{reservation.time}</span>
+                    </InfoGroup>
+                  </CardRow>
 
-                <CardRow>
-                  <div>
-                    <CourtInfo>{reservation.court}</CourtInfo>
-                    {!reservation.canCancel && (
-                      <WarningText>
-                        <AlertCircle size={16} style={{ marginRight: 4 }} />
-                        Cancelamento indisponível (menos de 24h)
-                      </WarningText>
-                    )}
-                  </div>
+                  <CardRow>
+                    <div>
+                      <CourtInfo>{reservation.court}</CourtInfo>
+                      {!reservation.canCancel && (
+                        <WarningText>
+                          <AlertCircle size={16} style={{ marginRight: 4 }} />
+                          Cancelamento indisponível (menos de 24h)
+                        </WarningText>
+                      )}
+                    </div>
 
-                  <CancelButton
-                    onClick={() => handleCancel(reservation.id)}
-                    disabled={!reservation.canCancel}
-                  >
-                    <XCircle size={16} style={{ marginRight: 8 }} />
-                    Cancelar
-                  </CancelButton>
-                </CardRow>
-              </ReservationCard>
+                    <CancelButton
+                      onClick={() => handleCancel(reservation.id)}
+                      disabled={!reservation.canCancel}
+                    >
+                      <XCircle size={16} style={{ marginRight: 8 }} />
+                      Cancelar
+                    </CancelButton>
+                  </CardRow>
+                </ReservationCard>
+              </motion.div>
             ))}
-          </>
+          </AnimatePresence>
         ) : (
           <EmptyState>
             <IconWrapper>
@@ -107,4 +153,3 @@ const CancellationScreen: React.FC<CancellationScreenProps> = ({ onNavigate, use
 };
 
 export default CancellationScreen;
-*/
