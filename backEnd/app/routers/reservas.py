@@ -42,16 +42,13 @@ def listar_reservas(current_user: dict = Depends(get_current_user)):
         for row in reservas:
             reserva_id, horario, quadra_nome = row
 
-            # Se 'horario' já for datetime, apenas formatamos
             horario_dt = horario
-            pode_cancelar = (horario_dt - datetime.now()) > timedelta(hours=24)
 
             result.append({
                 "id": reserva_id,
                 "date": horario_dt.strftime("%d/%m/%Y"),
-                "time": horario_dt.strftime("%H:%M") + " - " + (horario_dt + timedelta(hours=1)).strftime("%H:%M"),
-                "court": quadra_nome,
-                "canCancel": pode_cancelar
+                "time": horario_dt.strftime("%H:%M"),
+                "court": quadra_nome
             })
 
         return result
