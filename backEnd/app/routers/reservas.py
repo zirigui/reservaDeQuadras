@@ -30,17 +30,18 @@ def listar_reservas(current_user: dict = Depends(get_current_user)):
     try:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT r.id, r.horario, q.name as quadra
+                SELECT r.id, r.horario, q.name as quadra, r.horario - NOW() > INTERVAL '24 hours' AS pode_cancelar
                 FROM reservas r
                 JOIN quadras q ON r.quadra = q.id
                 WHERE r.user_id = %s
+                and CURRENT_DATE >= r.horario
                 ORDER BY r.horario
             """, (current_user["id"],))
             reservas = cur.fetchall()
 
         result = []
         for row in reservas:
-            reserva_id, horario, quadra_nome = row
+            reserva_id, horario, quadra_nome, pode_cancelar = row
 
             horario_dt = horario
 
@@ -48,7 +49,8 @@ def listar_reservas(current_user: dict = Depends(get_current_user)):
                 "id": reserva_id,
                 "date": horario_dt.strftime("%d/%m/%Y"),
                 "time": horario_dt.strftime("%H:%M"),
-                "court": quadra_nome
+                "court": quadra_nome,
+                "canCancel": pode_cancelar
             })
 
         return result
