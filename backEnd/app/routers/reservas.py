@@ -24,14 +24,6 @@ def criar_reserva(reserva: schemas.Reserva, current_user: dict = Depends(get_cur
     finally:
         conn.close()
 
-
-from fastapi import APIRouter, Depends
-from datetime import datetime, timedelta
-from app.dependencies import get_current_user
-from app.database import database
-
-router = APIRouter()
-
 @router.get("/reservas")
 def listar_reservas(current_user: dict = Depends(get_current_user)):
     conn = database.get_db_connection()
