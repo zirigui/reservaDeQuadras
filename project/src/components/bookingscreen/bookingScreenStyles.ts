@@ -1,5 +1,57 @@
 import styled from 'styled-components';
 
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+`;
+
+export const ModalContent = styled.div`
+  background: #fff;
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+`;
+
+export const ModalTitle = styled.h2`
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  color: #333;
+`;
+
+export const ModalText = styled.p`
+  font-size: 1rem;
+  color: #555;
+`;
+
+export const ModalButton = styled.button`
+  margin-top: 1.5rem;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #43a047;
+  }
+`;
+
+
 export const Container = styled.div`
   flex: 1;  
   min-height: 100vh;

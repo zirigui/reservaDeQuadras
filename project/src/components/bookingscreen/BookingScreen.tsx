@@ -5,7 +5,8 @@ import {
   CourtType, CourtSection, CourtButton,
   SelectedIndicator, CourtList, SectionTitle,
   TimeSection, TimeButton, TimeGrid,
-  ActionButtonContainer, ActionButton
+  ActionButtonContainer, ActionButton,ModalOverlay, ModalContent, ModalTitle,
+  ModalText, ModalButton
 } from './bookingScreenStyles';
 
 interface Court {
@@ -33,11 +34,13 @@ interface BookingScreenProps {
 
 const backendUrl = import.meta.env.VITE_API_URL
 
+
 const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedCourt, setSelectedCourt] = useState<Court | null>(null);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [courts, setCourts] = useState<Court[]>([]);
+  const [showModal, setShowModal] = useState(false);
 
   // Carregar quadras do backend
   useEffect(() => {
@@ -86,11 +89,8 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
 
       const data = await response.json();
 
-      onNavigate('confirmation', {
-        email: user.email,
-        horario: data.horario,
-        quadra: selectedCourt
-      });
+      setShowModal(true);
+    
     } catch (error) {
       alert('Erro ao confirmar reserva: ' + error);
     }
@@ -155,8 +155,27 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
           </ActionButton>
         </ActionButtonContainer>
       </Card>
+      {showModal && (
+  <ModalOverlay>
+    <ModalContent>
+      <ModalTitle>Agendamento Confirmado!</ModalTitle>
+      <ModalText>Sua quadra foi reservada com sucesso.</ModalText>
+      <ModalButton
+        onClick={() => {
+          setShowModal(false);
+          onNavigate('myBookings'); // Você pode mudar o destino se quiser
+        }}
+      >
+        OK
+      </ModalButton>
+    </ModalContent>
+  </ModalOverlay>
+)}
     </Container>
   );
 };
+
+
+
 
 export default BookingScreen;
