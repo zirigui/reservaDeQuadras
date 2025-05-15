@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { AvisosContainer, AvisoCard, AvisoTexto } from './AvisosStyles';
 
 interface Notice {
   id: number;
@@ -25,18 +26,18 @@ const NoticesScreen: React.FC = () => {
   }, []);
 
   return (
-    <div>
-      <h2>Avisos</h2>
+    <AvisosContainer>
+      <h2 style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>📢 Avisos</h2>
       {notices.length === 0 ? (
         <p>Nenhum aviso disponível.</p>
       ) : (
-        <ul>
-          {notices.map((notice) => (
-            <li key={notice.id}>{notice.message}</li>
-          ))}
-        </ul>
+        notices.map((notice) => (
+          <AvisoCard key={notice.id}>
+            <AvisoTexto>{notice.message}</AvisoTexto>
+          </AvisoCard>
+        ))
       )}
-    </div>
+    </AvisosContainer>
   );
 };
 
