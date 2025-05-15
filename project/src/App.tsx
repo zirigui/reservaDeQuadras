@@ -6,6 +6,7 @@ import Register from './components/register/Register';
 import Sidebar from './components/sidebar/Sidebar';
 import AdminScreen from './components/admin/admin';
 import CancellationScreen from './components/cancelationScreen/CancelationScreen';
+import NoticesScreen from './components/avisos/Avisos';
 
 interface User {
   id: string;
@@ -60,6 +61,10 @@ function App() {
               <Route
                 path="/admin"
                 element={<AdminScreen />}
+              />
+                   <Route
+                path="/avisos"
+                element={<NoticesScreen />}
               />
               <Route
                 path="/my-bookings"
