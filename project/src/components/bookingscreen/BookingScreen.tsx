@@ -163,7 +163,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
       <ModalButton
         onClick={() => {
           setShowModal(false);
-          onNavigate('myBookings'); // Você pode mudar o destino se quiser
+          onNavigate('myBookings');
         }}
       >
         OK

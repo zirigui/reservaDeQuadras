@@ -25,3 +25,9 @@ class Quadra(QuadraBase):
     id: int
     class Config:
         orm_mode = True
+
+class AvisoCreate(BaseModel):
+    message: str
+
+class Aviso(AvisoCreate):
+    id: int

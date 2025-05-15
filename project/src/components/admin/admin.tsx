@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { CourtCardContainer, CourtCard, CardContent, ActionGroup, Button, Form, Input, Label } from './adminStyles';
-import Modal from '../modal/returnModal'
+import {
+  CourtCardContainer,
+  CourtCard,
+  CardContent,
+  ActionGroup,
+  Button,
+  Form,
+  Input,
+  Label
+} from './adminStyles';
+import Modal from '../modal/returnModal';
 
 interface Court {
   id: number;
@@ -12,10 +21,11 @@ const backendUrl = import.meta.env.VITE_API_URL;
 
 const AdminScreen: React.FC = () => {
   const [courts, setCourts] = useState<Court[]>([]);
-  const [newCourtName, setNewCourtName] = useState<string>('');
-  const [newCourtType, setNewCourtType] = useState<string>('');
-  const [showModal, setShowModal] = useState<boolean>(false);  // Estado para controlar a exibição do modal
-  const [modalMessage, setModalMessage] = useState<string>('');  // Mensagem do modal
+  const [newCourtName, setNewCourtName] = useState('');
+  const [newCourtType, setNewCourtType] = useState('');
+  const [newNotice, setNewNotice] = useState(''); // Novo aviso
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
   const token = localStorage.getItem('token');
 
   const loadCourts = async () => {
@@ -42,12 +52,11 @@ const AdminScreen: React.FC = () => {
 
   const handleDelete = async (id: number) => {
     if (!confirm('Tem certeza que deseja excluir esta quadra?')) return;
-
     try {
       await fetch(`${backendUrl}/quadras/${id}`, {
         method: 'DELETE',
       });
-      loadCourts(); // Recarrega a lista de quadras
+      loadCourts();
     } catch (error) {
       console.error('Erro ao excluir quadra:', error);
     }
@@ -55,12 +64,10 @@ const AdminScreen: React.FC = () => {
 
   const handleAddCourt = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!newCourtName || !newCourtType) {
       alert('Por favor, preencha todos os campos');
       return;
     }
-
     try {
       const response = await fetch(`${backendUrl}/quadras`, {
         method: 'POST',
@@ -77,9 +84,9 @@ const AdminScreen: React.FC = () => {
       if (response.ok) {
         setNewCourtName('');
         setNewCourtType('');
-        loadCourts(); // Recarrega a lista de quadras após adicionar
+        loadCourts();
         setModalMessage('Quadra cadastrada com sucesso!');
-        setShowModal(true); // Exibe o modal
+        setShowModal(true);
       } else {
         console.error('Erro ao adicionar quadra');
       }
@@ -88,10 +95,39 @@ const AdminScreen: React.FC = () => {
     }
   };
 
+  const handleAddNotice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newNotice) {
+      alert('Digite um aviso');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${backendUrl}/avisos`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ message: newNotice }),
+      });
+
+      if (response.ok) {
+        setNewNotice('');
+        setModalMessage('Aviso publicado com sucesso!');
+        setShowModal(true);
+      } else {
+        console.error('Erro ao publicar aviso');
+      }
+    } catch (error) {
+      console.error('Erro ao publicar aviso:', error);
+    }
+  };
+
   const handleModalClose = (result: boolean) => {
     setShowModal(false);
     if (result) {
-      console.log('Ação confirmada: Quadra cadastrada');
+      console.log('Ação confirmada');
     }
   };
 
@@ -120,6 +156,21 @@ const AdminScreen: React.FC = () => {
           />
         </div>
         <Button type="submit">Cadastrar Quadra</Button>
+      </Form>
+
+      <h2>Publicar Aviso</h2>
+      <Form onSubmit={handleAddNotice}>
+        <div>
+          <Label htmlFor="notice">Mensagem do Aviso:</Label>
+          <Input
+            id="notice"
+            type="text"
+            value={newNotice}
+            onChange={(e) => setNewNotice(e.target.value)}
+            required
+          />
+        </div>
+        <Button type="submit">Publicar Aviso</Button>
       </Form>
 
       <CourtCardContainer>
