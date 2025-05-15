@@ -44,6 +44,7 @@ function App() {
     if (screen === 'myBookings') window.location.href = '/my-bookings';
     if (screen === 'replays') window.location.href = '/replays';
     if (screen === 'admin') window.location.href = '/admin'
+    if (screen === 'avisos') window.location.href = '/avisos'
   };
 
   return (
