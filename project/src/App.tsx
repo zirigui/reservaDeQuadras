@@ -42,9 +42,10 @@ function App() {
 
     if (screen === 'booking') window.location.href = '/';
     if (screen === 'myBookings') window.location.href = '/my-bookings';
-    if (screen === 'replays') window.location.href = '/replays';
+    if (screen === 'settings') window.location.href = '/settings';
     if (screen === 'admin') window.location.href = '/admin';
     if (screen === 'notices') window.location.href = '/avisos';
+    if (screen === 'notifications') window.location.href = '/notifications';
   };
 
   if (loading) {
@@ -67,7 +68,7 @@ function App() {
               <Route path="/admin" element={<AdminScreen />} />
               <Route path="/avisos" element={<NoticesScreen />} />
               <Route path="/my-bookings" element={<CancellationScreen onNavigate={handleNavigate} user={user} />} />
-              <Route path="/replays" element={<div>Replays (placeholder)</div>} />
+              <Route path="/settings" element={<div>Configurações</div>} />
               <Route path="/login" element={<Navigate to="/" />} />
               <Route path="/register" element={<Navigate to="/" />} />
             </Routes>
