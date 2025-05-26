@@ -12,16 +12,20 @@ export const SidebarContainer = styled.div`
 `;
 
 export const MenuGroup = styled.div`
+  padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  flex: 1;
+  overflow-y: auto;
+  flex-grow: 1;
 `;
 
 export const FixedBottomButtons = styled.div`
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  border-top: 1px solid #374151;
 `;
 
 export const MenuItem = styled.button`
