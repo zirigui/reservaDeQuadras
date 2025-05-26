@@ -2,6 +2,8 @@ import React from 'react';
 import {
     SidebarContainer,
     MenuItem,
+    FixedBottomButtons,
+    SettingsButton,
     MenuGroup,
     LogoutButton
   } from './SidebarStyles';
@@ -22,9 +24,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
         <MenuItem onClick={() => onNavigate('myBookings')}>Meus agendamentos</MenuItem>
         <MenuItem onClick={() => onNavigate('notifications')}>Notificações</MenuItem>
       </MenuGroup>
-      
-      <MenuItem onClick={() => onNavigate('settings')}>Configurações</MenuItem>
-      <LogoutButton onClick={() => onNavigate('logout')}>Sair</LogoutButton>
+      <FixedBottomButtons>
+        <SettingsButton onClick={() => onNavigate('settings')}>Configurações</SettingsButton>
+        <LogoutButton onClick={() => onNavigate('logout')}>Sair</LogoutButton>
+      </FixedBottomButtons>
     </SidebarContainer>
   );
 };

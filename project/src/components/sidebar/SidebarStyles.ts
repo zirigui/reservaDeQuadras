@@ -2,18 +2,26 @@ import styled from 'styled-components';
 
 export const SidebarContainer = styled.div`
   width: 240px;
-  background-color: #1f2937; // Tailwind gray-800 (profundo, mas não tão escuro)
+  background-color: #1f2937; // Tailwind gray-800
   color: white;
   min-height: 100vh;
   padding: 2rem 1rem;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 `;
 
 export const MenuGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
+  flex: 1;
+`;
+
+export const FixedBottomButtons = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
 `;
 
 export const MenuItem = styled.button`
@@ -32,12 +40,18 @@ export const MenuItem = styled.button`
   }
 `;
 
-export const LogoutButton = styled(MenuItem)`
-  margin-top: auto;
-  background-color: #ef4444; // Tailwind red-500
-  color: white;
+export const SettingsButton = styled(MenuItem)`
+  background: none;
 
   &:hover {
-    background-color: #dc2626; // Tailwind red-600
+    background-color: #3b82f6; // Tailwind emerald-600
+  }
+`;
+
+export const LogoutButton = styled(MenuItem)`
+  background: none;
+
+  &:hover {
+    background-color: #3b82f6; // Tailwind red-600
   }
 `;
