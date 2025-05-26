@@ -14,16 +14,16 @@ interface User {
   email: string;
 }
 
-
-
 function App() {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true); // Novo estado de carregamento
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
+    setLoading(false); // Finaliza o carregamento após verificar o localStorage
   }, []);
 
   const handleLogin = (userData: User) => {
@@ -43,45 +43,50 @@ function App() {
     if (screen === 'booking') window.location.href = '/';
     if (screen === 'myBookings') window.location.href = '/my-bookings';
     if (screen === 'replays') window.location.href = '/replays';
-    if (screen === 'admin') window.location.href = '/admin'
-    if (screen === 'notices') window.location.href = '/avisos'
+    if (screen === 'admin') window.location.href = '/admin';
+    if (screen === 'notices') window.location.href = '/avisos';
   };
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Carregando...
+      </div>
+    );
+  }
+
   return (
-  <Router>
-    {user ? (
-      // Layout para usuários autenticados
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex">
-        <Sidebar onNavigate={handleNavigate} />
-        <div className="flex-1 p-4">
-          <Routes>
-            <Route path="/" element={<BookingScreen user={user} onNavigate={() => {}} />} />
-            <Route path="/admin" element={<AdminScreen />} />
-            <Route path="/avisos" element={<NoticesScreen />} />
-            <Route path="/my-bookings" element={<CancellationScreen onNavigate={handleNavigate} user={user} />} />
-            <Route path="/replays" element={<div>Replays (placeholder)</div>} />
-
-            {/* Evita voltar ao login/registro se já estiver logado */}
-            <Route path="/login" element={<Navigate to="/" />} />
-            <Route path="/register" element={<Navigate to="/" />} />
-          </Routes>
+    <Router>
+      {user ? (
+        // Layout para usuários autenticados
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex">
+          <Sidebar onNavigate={handleNavigate} />
+          <div className="flex-1 p-4">
+            <Routes>
+              <Route path="/" element={<BookingScreen user={user} onNavigate={() => {}} />} />
+              <Route path="/admin" element={<AdminScreen />} />
+              <Route path="/avisos" element={<NoticesScreen />} />
+              <Route path="/my-bookings" element={<CancellationScreen onNavigate={handleNavigate} user={user} />} />
+              <Route path="/replays" element={<div>Replays (placeholder)</div>} />
+              <Route path="/login" element={<Navigate to="/" />} />
+              <Route path="/register" element={<Navigate to="/" />} />
+            </Routes>
+          </div>
         </div>
-      </div>
-    ) : (
-      // Layout para usuários não autenticados
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="w-full max-w-md p-4">
-          <Routes>
-            <Route path="/login" element={<Login onLogin={handleLogin} />} />
-            <Route path="/register" element={<Register />} />
-
-            {/* Redireciona qualquer rota protegida para login */}
-            <Route path="*" element={<Navigate to="/login" />} />
-          </Routes>
+      ) : (
+        // Layout para usuários não autenticados
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+          <div className="w-full max-w-md p-4">
+            <Routes>
+              <Route path="/login" element={<Login onLogin={handleLogin} />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="*" element={<Navigate to="/login" />} />
+            </Routes>
+          </div>
         </div>
-      </div>
-    )}
-  </Router>
-);
+      )}
+    </Router>
+  );
 }
+
 export default App;
