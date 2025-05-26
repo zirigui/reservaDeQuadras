@@ -2,7 +2,7 @@ import styled from 'styled-components';
 
 export const SidebarContainer = styled.div`
   width: 240px;
-  background-color: #1e3a8a; // Tailwind gray-800
+  background-color: #1f2937; // Tailwind gray-800
   color: white;
   min-height: 100vh;
   padding: 1rem;
