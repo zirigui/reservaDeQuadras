@@ -14,7 +14,15 @@ const NoticesScreen: React.FC = () => {
   useEffect(() => {
     const fetchNotices = async () => {
       try {
-        const response = await fetch(`${backendUrl}/avisos`);
+        const token = localStorage.getItem('token');
+        const response = await fetch(`${backendUrl}/avisos`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Erro ao buscar avisos');
+        }
         const data = await response.json();
         setNotices(data);
       } catch (error) {

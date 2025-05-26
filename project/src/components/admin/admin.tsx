@@ -42,7 +42,11 @@ const AdminScreen: React.FC = () => {
 
   const loadCourts = async () => {
     try {
-      const response = await fetch(`${backendUrl}/quadras`);
+      const response = await fetch(`${backendUrl}/quadras`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       if (Array.isArray(data)) setCourts(data);
     } catch (error) {
@@ -52,7 +56,11 @@ const AdminScreen: React.FC = () => {
 
   const loadNotices = async () => {
     try {
-      const response = await fetch(`${backendUrl}/avisos`);
+      const response = await fetch(`${backendUrl}/avisos`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
       if (Array.isArray(data)) setNotices(data);
     } catch (error) {
@@ -76,7 +84,7 @@ const AdminScreen: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ name: newCourtName, type: newCourtType }),
       });
@@ -103,7 +111,7 @@ const AdminScreen: React.FC = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ message: newNotice }),
       });
@@ -121,7 +129,12 @@ const AdminScreen: React.FC = () => {
   const handleDeleteCourt = async (id: number) => {
     if (!confirm('Deseja mesmo excluir esta quadra?')) return;
     try {
-      await fetch(`${backendUrl}/quadras/${id}`, { method: 'DELETE' });
+      await fetch(`${backendUrl}/quadras/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       loadCourts();
     } catch (error) {
       console.error('Erro ao excluir quadra:', error);
@@ -131,7 +144,12 @@ const AdminScreen: React.FC = () => {
   const handleDeleteNotice = async (id: number) => {
     if (!confirm('Deseja mesmo excluir este aviso?')) return;
     try {
-      await fetch(`${backendUrl}/avisos/${id}`, { method: 'DELETE' });
+      await fetch(`${backendUrl}/avisos/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       loadNotices();
     } catch (error) {
       console.error('Erro ao excluir aviso:', error);
@@ -150,7 +168,7 @@ const AdminScreen: React.FC = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ message: editNoticeMessage }),
       });
