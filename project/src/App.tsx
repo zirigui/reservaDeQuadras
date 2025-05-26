@@ -16,14 +16,17 @@ interface User {
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true); // Novo estado de carregamento
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
+    const token = localStorage.getItem('token');
+
+    if (storedUser && token) {
       setUser(JSON.parse(storedUser));
     }
-    setLoading(false); // Finaliza o carregamento após verificar o localStorage
+
+    setLoading(false);
   }, []);
 
   const handleLogin = (userData: User) => {
@@ -59,14 +62,13 @@ function App() {
   return (
     <Router>
       {user ? (
-        // Layout para usuários autenticados
         <div className="min-h-screen flex">
           <div className="w-60 fixed h-screen bg-gray-800 text-white">
             <Sidebar onNavigate={handleNavigate} />
           </div>
-        <div className="ml-60 flex-1 p-4 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen overflow-y-auto">
+          <div className="ml-60 flex-1 p-4 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen overflow-y-auto">
             <Routes>
-              <Route path="/" element={<BookingScreen user={user} onNavigate={() => {}} />} />
+              <Route path="/" element={<BookingScreen user={user} onNavigate={handleNavigate} />} />
               <Route path="/admin" element={<AdminScreen />} />
               <Route path="/avisos" element={<NoticesScreen />} />
               <Route path="/my-bookings" element={<CancellationScreen onNavigate={handleNavigate} user={user} />} />
@@ -77,7 +79,6 @@ function App() {
           </div>
         </div>
       ) : (
-        // Layout para usuários não autenticados
         <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
           <div className="w-full max-w-md p-4">
             <Routes>
