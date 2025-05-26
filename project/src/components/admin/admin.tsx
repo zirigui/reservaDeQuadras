@@ -7,7 +7,11 @@ import {
   Button,
   Form,
   Input,
-  Label
+  Label,
+  SectionTitle,
+  NoticeCardContainer,
+  NoticeCard,
+  NoticeTextArea
 } from './adminStyles';
 import Modal from '../modal/returnModal';
 
@@ -17,13 +21,21 @@ interface Court {
   type: string;
 }
 
+interface Notice {
+  id: number;
+  message: string;
+}
+
 const backendUrl = import.meta.env.VITE_API_URL;
 
 const AdminScreen: React.FC = () => {
   const [courts, setCourts] = useState<Court[]>([]);
   const [newCourtName, setNewCourtName] = useState('');
   const [newCourtType, setNewCourtType] = useState('');
-  const [newNotice, setNewNotice] = useState(''); // Novo aviso
+  const [notices, setNotices] = useState<Notice[]>([]);
+  const [newNotice, setNewNotice] = useState('');
+  const [editNoticeId, setEditNoticeId] = useState<number | null>(null);
+  const [editNoticeMessage, setEditNoticeMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const token = localStorage.getItem('token');
@@ -32,40 +44,31 @@ const AdminScreen: React.FC = () => {
     try {
       const response = await fetch(`${backendUrl}/quadras`);
       const data = await response.json();
-      if (Array.isArray(data)) {
-        setCourts(data);
-      } else {
-        console.error('A resposta da API não é um array válido:', data);
-      }
+      if (Array.isArray(data)) setCourts(data);
     } catch (error) {
       console.error('Erro ao carregar quadras:', error);
     }
   };
 
-  useEffect(() => {
-    loadCourts();
-  }, []);
-
-  const handleEdit = (court: Court) => {
-    alert(`Editar quadra: ${court.name}`);
-  };
-
-  const handleDelete = async (id: number) => {
-    if (!confirm('Tem certeza que deseja excluir esta quadra?')) return;
+  const loadNotices = async () => {
     try {
-      await fetch(`${backendUrl}/quadras/${id}`, {
-        method: 'DELETE',
-      });
-      loadCourts();
+      const response = await fetch(`${backendUrl}/avisos`);
+      const data = await response.json();
+      if (Array.isArray(data)) setNotices(data);
     } catch (error) {
-      console.error('Erro ao excluir quadra:', error);
+      console.error('Erro ao carregar avisos:', error);
     }
   };
+
+  useEffect(() => {
+    loadCourts();
+    loadNotices();
+  }, []);
 
   const handleAddCourt = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCourtName || !newCourtType) {
-      alert('Por favor, preencha todos os campos');
+      alert('Preencha todos os campos da quadra');
       return;
     }
     try {
@@ -75,33 +78,26 @@ const AdminScreen: React.FC = () => {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({
-          name: newCourtName,
-          type: newCourtType,
-        }),
+        body: JSON.stringify({ name: newCourtName, type: newCourtType }),
       });
-
       if (response.ok) {
         setNewCourtName('');
         setNewCourtType('');
         loadCourts();
         setModalMessage('Quadra cadastrada com sucesso!');
         setShowModal(true);
-      } else {
-        console.error('Erro ao adicionar quadra');
       }
     } catch (error) {
-      console.error('Erro ao adicionar quadra:', error);
+      console.error('Erro ao cadastrar quadra:', error);
     }
   };
 
   const handleAddNotice = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNotice) {
-      alert('Digite um aviso');
+      alert('Digite uma mensagem de aviso');
       return;
     }
-
     try {
       const response = await fetch(`${backendUrl}/avisos`, {
         method: 'POST',
@@ -111,86 +107,130 @@ const AdminScreen: React.FC = () => {
         },
         body: JSON.stringify({ message: newNotice }),
       });
-
       if (response.ok) {
         setNewNotice('');
+        loadNotices();
         setModalMessage('Aviso publicado com sucesso!');
         setShowModal(true);
-      } else {
-        console.error('Erro ao publicar aviso');
       }
     } catch (error) {
       console.error('Erro ao publicar aviso:', error);
     }
   };
 
-  const handleModalClose = (result: boolean) => {
-    setShowModal(false);
-    if (result) {
-      console.log('Ação confirmada');
+  const handleDeleteCourt = async (id: number) => {
+    if (!confirm('Deseja mesmo excluir esta quadra?')) return;
+    try {
+      await fetch(`${backendUrl}/quadras/${id}`, { method: 'DELETE' });
+      loadCourts();
+    } catch (error) {
+      console.error('Erro ao excluir quadra:', error);
     }
+  };
+
+  const handleDeleteNotice = async (id: number) => {
+    if (!confirm('Deseja mesmo excluir este aviso?')) return;
+    try {
+      await fetch(`${backendUrl}/avisos/${id}`, { method: 'DELETE' });
+      loadNotices();
+    } catch (error) {
+      console.error('Erro ao excluir aviso:', error);
+    }
+  };
+
+  const handleEditNotice = (notice: Notice) => {
+    setEditNoticeId(notice.id);
+    setEditNoticeMessage(notice.message);
+  };
+
+  const handleSaveEditNotice = async () => {
+    if (!editNoticeMessage.trim()) return;
+    try {
+      const response = await fetch(`${backendUrl}/avisos/${editNoticeId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ message: editNoticeMessage }),
+      });
+      if (response.ok) {
+        setEditNoticeId(null);
+        setEditNoticeMessage('');
+        loadNotices();
+        setModalMessage('Aviso atualizado com sucesso!');
+        setShowModal(true);
+      }
+    } catch (error) {
+      console.error('Erro ao editar aviso:', error);
+    }
+  };
+
+  const handleModalClose = () => {
+    setShowModal(false);
   };
 
   return (
     <div>
-      <h2>Cadastrar Nova Quadra</h2>
+      <SectionTitle>Cadastrar Nova Quadra</SectionTitle>
       <Form onSubmit={handleAddCourt}>
-        <div>
-          <Label htmlFor="courtName">Nome da Quadra:</Label>
-          <Input
-            id="courtName"
-            type="text"
-            value={newCourtName}
-            onChange={(e) => setNewCourtName(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="courtType">Tipo de Quadra:</Label>
-          <Input
-            id="courtType"
-            type="text"
-            value={newCourtType}
-            onChange={(e) => setNewCourtType(e.target.value)}
-            required
-          />
-        </div>
+        <Label>Nome:</Label>
+        <Input value={newCourtName} onChange={(e) => setNewCourtName(e.target.value)} required />
+        <Label>Tipo:</Label>
+        <Input value={newCourtType} onChange={(e) => setNewCourtType(e.target.value)} required />
         <Button type="submit">Cadastrar Quadra</Button>
       </Form>
 
-      <h2>Publicar Aviso</h2>
+      <SectionTitle>Quadras Cadastradas</SectionTitle>
+      <CourtCardContainer>
+        {courts.map((court) => (
+          <CourtCard key={court.id}>
+            <CardContent>
+              <h3>{court.name}</h3>
+              <p>{court.type}</p>
+            </CardContent>
+            <ActionGroup>
+              <Button onClick={() => alert(`Editar quadra: ${court.name}`)}>✏️ Editar</Button>
+              <Button onClick={() => handleDeleteCourt(court.id)}>🗑️ Excluir</Button>
+            </ActionGroup>
+          </CourtCard>
+        ))}
+      </CourtCardContainer>
+
+      <SectionTitle>Publicar Aviso</SectionTitle>
       <Form onSubmit={handleAddNotice}>
-        <div>
-          <Label htmlFor="notice">Mensagem do Aviso:</Label>
-          <Input
-            id="notice"
-            type="text"
-            value={newNotice}
-            onChange={(e) => setNewNotice(e.target.value)}
-            required
-          />
-        </div>
+        <Label>Mensagem:</Label>
+        <Input value={newNotice} onChange={(e) => setNewNotice(e.target.value)} required />
         <Button type="submit">Publicar Aviso</Button>
       </Form>
 
-      <CourtCardContainer>
-        {courts.length === 0 ? (
-          <p>Não há quadras cadastradas ainda.</p>
-        ) : (
-          courts.map((court) => (
-            <CourtCard key={court.id}>
-              <CardContent>
-                <h3>{court.name}</h3>
-                <p>{court.type}</p>
-              </CardContent>
-              <ActionGroup>
-                <Button onClick={() => handleEdit(court)}>✏️ Editar</Button>
-                <Button onClick={() => handleDelete(court.id)}>🗑️ Excluir</Button>
-              </ActionGroup>
-            </CourtCard>
-          ))
-        )}
-      </CourtCardContainer>
+      <SectionTitle>Avisos Publicados</SectionTitle>
+      <NoticeCardContainer>
+        {notices.map((notice) => (
+          <NoticeCard key={notice.id}>
+            {editNoticeId === notice.id ? (
+              <>
+                <NoticeTextArea
+                  value={editNoticeMessage}
+                  onChange={(e) => setEditNoticeMessage(e.target.value)}
+                />
+                <ActionGroup>
+                  <Button onClick={handleSaveEditNotice}>💾 Salvar</Button>
+                  <Button onClick={() => setEditNoticeId(null)}>❌ Cancelar</Button>
+                </ActionGroup>
+              </>
+            ) : (
+              <>
+                <p>{notice.message}</p>
+                <ActionGroup>
+                  <Button onClick={() => handleEditNotice(notice)}>✏️ Editar</Button>
+                  <Button onClick={() => handleDeleteNotice(notice.id)}>🗑️ Excluir</Button>
+                </ActionGroup>
+              </>
+            )}
+          </NoticeCard>
+        ))}
+      </NoticeCardContainer>
 
       {showModal && (
         <Modal message={modalMessage} onClose={handleModalClose} />
