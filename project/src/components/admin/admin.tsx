@@ -32,6 +32,10 @@ const AdminScreen: React.FC = () => {
   const [courts, setCourts] = useState<Court[]>([]);
   const [newCourtName, setNewCourtName] = useState('');
   const [newCourtType, setNewCourtType] = useState('');
+  const [editCourtId, setEditCourtId] = useState<number | null>(null);
+  const [editCourtName, setEditCourtName] = useState('');
+  const [editCourtType, setEditCourtType] = useState('');
+
   const [notices, setNotices] = useState<Notice[]>([]);
   const [newNotice, setNewNotice] = useState('');
   const [editNoticeId, setEditNoticeId] = useState<number | null>(null);
@@ -100,6 +104,55 @@ const AdminScreen: React.FC = () => {
     }
   };
 
+  const handleEditCourt = (court: Court) => {
+    setEditCourtId(court.id);
+    setEditCourtName(court.name);
+    setEditCourtType(court.type);
+  };
+
+  const handleSaveEditCourt = async (courtId: number) => {
+    if (!editCourtName || !editCourtType) {
+      alert('Preencha todos os campos para editar a quadra.');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${backendUrl}/quadras/${courtId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ name: editCourtName, type: editCourtType }),
+      });
+      if (response.ok) {
+        setEditCourtId(null);
+        setEditCourtName('');
+        setEditCourtType('');
+        loadCourts();
+        setModalMessage('Quadra atualizada com sucesso!');
+        setShowModal(true);
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar quadra:', error);
+    }
+  };
+
+  const handleDeleteCourt = async (id: number) => {
+    if (!confirm('Deseja mesmo excluir esta quadra?')) return;
+    try {
+      await fetch(`${backendUrl}/quadras/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      loadCourts();
+    } catch (error) {
+      console.error('Erro ao excluir quadra:', error);
+    }
+  };
+
   const handleAddNotice = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNotice) {
@@ -123,21 +176,6 @@ const AdminScreen: React.FC = () => {
       }
     } catch (error) {
       console.error('Erro ao publicar aviso:', error);
-    }
-  };
-
-  const handleDeleteCourt = async (id: number) => {
-    if (!confirm('Deseja mesmo excluir esta quadra?')) return;
-    try {
-      await fetch(`${backendUrl}/quadras/${id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      loadCourts();
-    } catch (error) {
-      console.error('Erro ao excluir quadra:', error);
     }
   };
 
@@ -203,14 +241,29 @@ const AdminScreen: React.FC = () => {
       <CourtCardContainer>
         {courts.map((court) => (
           <CourtCard key={court.id}>
-            <CardContent>
-              <h3>{court.name}</h3>
-              <p>{court.type}</p>
-            </CardContent>
-            <ActionGroup>
-              <Button onClick={() => alert(`Editar quadra: ${court.name}`)}>✏️ Editar</Button>
-              <Button onClick={() => handleDeleteCourt(court.id)}>🗑️ Excluir</Button>
-            </ActionGroup>
+            {editCourtId === court.id ? (
+              <CardContent>
+                <Label>Nome:</Label>
+                <Input value={editCourtName} onChange={(e) => setEditCourtName(e.target.value)} />
+                <Label>Tipo:</Label>
+                <Input value={editCourtType} onChange={(e) => setEditCourtType(e.target.value)} />
+                <ActionGroup>
+                  <Button onClick={() => handleSaveEditCourt(court.id)}>💾 Salvar</Button>
+                  <Button onClick={() => setEditCourtId(null)}>❌ Cancelar</Button>
+                </ActionGroup>
+              </CardContent>
+            ) : (
+              <>
+                <CardContent>
+                  <h3>{court.name}</h3>
+                  <p>{court.type}</p>
+                </CardContent>
+                <ActionGroup>
+                  <Button onClick={() => handleEditCourt(court)}>✏️ Editar</Button>
+                  <Button onClick={() => handleDeleteCourt(court.id)}>🗑️ Excluir</Button>
+                </ActionGroup>
+              </>
+            )}
           </CourtCard>
         ))}
       </CourtCardContainer>
@@ -250,9 +303,7 @@ const AdminScreen: React.FC = () => {
         ))}
       </NoticeCardContainer>
 
-      {showModal && (
-        <Modal message={modalMessage} onClose={handleModalClose} />
-      )}
+      {showModal && <Modal message={modalMessage} onClose={handleModalClose} />}
     </div>
   );
 };
