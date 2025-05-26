@@ -60,9 +60,11 @@ function App() {
     <Router>
       {user ? (
         // Layout para usuários autenticados
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex">
-          <Sidebar onNavigate={handleNavigate} />
-          <div className="flex-1 p-4">
+        <div className="min-h-screen flex">
+          <div className="w-60 fixed h-screen bg-gray-800 text-white">
+            <Sidebar onNavigate={handleNavigate} />
+          </div>
+        <div className="ml-60 flex-1 p-4 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen overflow-y-auto">
             <Routes>
               <Route path="/" element={<BookingScreen user={user} onNavigate={() => {}} />} />
               <Route path="/admin" element={<AdminScreen />} />

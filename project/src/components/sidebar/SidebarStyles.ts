@@ -2,30 +2,29 @@ import styled from 'styled-components';
 
 export const SidebarContainer = styled.div`
   width: 240px;
-  background-color: #1f2937; // Tailwind gray-800
+  background-color: #1e3a8a; // Tailwind gray-800
   color: white;
   min-height: 100vh;
-  padding: 2rem 1rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`;
-
-export const MenuGroup = styled.div`
-  padding: 2rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  overflow-y: auto;
-  flex-grow: 1;
-`;
-
-export const FixedBottomButtons = styled.div`
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  border-top: 1px solid #374151;
+  justify-content: space-between;
+  position: fixed;
+  top: 0;
+  left: 0;
+`;
+
+export const MenuGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+`;
+
+export const FixedBottomButtons = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: auto;
 `;
 
 export const MenuItem = styled.button`
