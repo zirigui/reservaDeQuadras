@@ -16,7 +16,9 @@ import {
   EmptyState,
   IconWrapper,
   EmptyTitle,
-  EmptyText
+  EmptyText,
+  ModalOverlay, ModalContent, ModalTitle,
+  ModalText, ModalButton
 } from './cancelationScreenStyles';
 
 interface Reservation {
@@ -41,6 +43,7 @@ const backendUrl = import.meta.env.VITE_API_URL;
 
 const CancellationScreen: React.FC<CancellationScreenProps> = ({ onNavigate }) => {
   const [reservations, setReservations] = useState<Reservation[]>([]);
+  const [showModal, setShowModal] = useState(false);
   const token = localStorage.getItem('token');
 
   // 1. Carrega reservas do usuário
@@ -72,6 +75,7 @@ const CancellationScreen: React.FC<CancellationScreenProps> = ({ onNavigate }) =
       if (res.ok) {
         // dispara animação de saída
         setReservations((prev) => prev.filter((r) => r.id !== id));
+        setShowModal(true);
       } else {
         const err = await res.json();
         alert(`Erro: ${err.detail}`);
@@ -148,6 +152,24 @@ const CancellationScreen: React.FC<CancellationScreenProps> = ({ onNavigate }) =
           </EmptyState>
         )}
       </Wrapper>
+
+
+      {showModal && (
+              <ModalOverlay>
+                <ModalContent>
+                  <ModalTitle>Agendamento Confirmado!</ModalTitle>
+                  <ModalText>Sua quadra foi reservada com sucesso.</ModalText>
+                  <ModalButton
+                    onClick={() => {
+                      setShowModal(false);
+                      onNavigate('myBookings');
+                    }}
+                  >
+                    OK
+                  </ModalButton>
+                </ModalContent>
+              </ModalOverlay>
+            )}
     </Container>
   );
 };
