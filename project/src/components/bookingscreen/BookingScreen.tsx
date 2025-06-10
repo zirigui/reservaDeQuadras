@@ -190,6 +190,8 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
                     key={time}
                     onClick={() => !isOccupied && setSelectedTime(time)}
                     selected={selectedTime === time}
+                    occupied={isOccupied}
+                    disabled={isOccupied}
                   >
                     {time}
                   </TimeButton>

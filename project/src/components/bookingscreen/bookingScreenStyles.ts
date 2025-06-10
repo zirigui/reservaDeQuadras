@@ -152,19 +152,35 @@ export const TimeGrid = styled.div`
   gap: 0.5rem;
 `;
 
-export const TimeButton = styled.button<{ selected: boolean }>`
+export const TimeButton = styled.button<{ selected: boolean; occupied: boolean }>`
   padding: 0.75rem;
   text-align: center;
   border-radius: 0.75rem;
-  background-color: ${(props) => (props.selected ? '#4F46E5' : '#F3F4F6')};
-  color: ${(props) => (props.selected ? 'white' : '#4B5563')};
-  cursor: pointer;
+  background-color: ${(props) =>
+    props.occupied ? '#FECACA' : props.selected ? '#4F46E5' : '#F3F4F6'};
+  color: ${(props) =>
+    props.occupied ? '#B91C1C' : props.selected ? 'white' : '#4B5563'};
+  border: 2px solid
+    ${(props) =>
+      props.occupied
+        ? '#F87171'
+        : props.selected
+        ? '#4F46E5'
+        : 'transparent'};
+  opacity: ${(props) => (props.occupied ? 0.6 : 1)};
+  cursor: ${(props) => (props.occupied ? 'not-allowed' : 'pointer')};
   transition: background-color 0.3s;
 
   &:hover {
-    background-color: ${(props) => (props.selected ? '#4338CA' : '#E5E7EB')};
+    background-color: ${(props) =>
+      props.occupied
+        ? '#FECACA'
+        : props.selected
+        ? '#4338CA'
+        : '#E5E7EB'};
   }
 `;
+
 
 export const ActionButtonContainer = styled.div`
   margin-top: 2rem;
