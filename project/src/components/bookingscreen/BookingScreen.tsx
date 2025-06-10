@@ -41,6 +41,32 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
   const [courts, setCourts] = useState<Court[]>([]);
   const [showModal, setShowModal] = useState(false);
+  const [occupiedTimes, setOccupiedTimes] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchOccupiedTimes = async () => {
+      if (!selectedCourt) return;
+
+      const token = localStorage.getItem('token');
+      const dateStr = selectedDate.toISOString().split('T')[0];
+
+      try {
+        const res = await fetch(`${backendUrl}/quadra/${selectedCourt.id}/horarios_ocupados?data=${dateStr}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+
+        if (!res.ok) throw new Error('Erro ao buscar horários ocupados');
+
+        const data = await res.json();
+        setOccupiedTimes(data);
+      } catch (error) {
+        console.error('Erro:', error);
+      }
+    };
+
+    fetchOccupiedTimes();
+  }, [selectedCourt, selectedDate]);
+
 
   useEffect(() => {
     const loadCourts = async () => {
@@ -157,15 +183,18 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
           <TimeSection>
             <SectionTitle>Horários Disponíveis</SectionTitle>
             <TimeGrid>
-              {timeSlots.map((time) => (
-                <TimeButton
-                  key={time}
-                  onClick={() => setSelectedTime(time)}
-                  selected={selectedTime === time}
-                >
-                  {time}
-                </TimeButton>
-              ))}
+              {timeSlots.map((time) => {
+                const isOccupied = occupiedTimes.includes(time);
+                return (
+                  <TimeButton
+                    key={time}
+                    onClick={() => !isOccupied && setSelectedTime(time)}
+                    selected={selectedTime === time}
+                  >
+                    {time}
+                  </TimeButton>
+                );
+              })}
             </TimeGrid>
           </TimeSection>
         </Content>

@@ -8,6 +8,14 @@ router = APIRouter()
 def criar_reserva(reserva: schemas.Reserva, current_user: dict = Depends(get_current_user)):
     conn = database.get_db_connection()
     try:
+        with conn.cursor() as cur:
+            # Verificar se já existe reserva para a mesma quadra e horário
+            cur.execute("""
+                SELECT 1 FROM reservas
+                WHERE quadra = %s AND horario = %s
+            """, (reserva.quadra, reserva.horario))
+            if cur.fetchone():
+                raise HTTPException(status_code=409, detail="Horário já reservado para esta quadra")
         # Inserindo a reserva no banco
         with conn.cursor() as cur:
             cur.execute("""
@@ -23,6 +31,22 @@ def criar_reserva(reserva: schemas.Reserva, current_user: dict = Depends(get_cur
         raise HTTPException(status_code=500, detail=f"Erro ao criar reserva: {e}")
     finally:
         conn.close()
+
+@router.get("/quadra/{quadra_id}/horarios_ocupados")
+def horarios_ocupados(quadra_id: int, data: str, current_user: dict = Depends(get_current_user)):
+    conn = database.get_db_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT horario FROM reservas
+                WHERE quadra = %s AND DATE(horario) = %s
+            """, (quadra_id, data))
+            horarios = cur.fetchall()
+
+        return [h[0].strftime("%H:%M") for h in horarios]
+    finally:
+        conn.close()
+
 
 @router.get("/reservas")
 def listar_reservas(current_user: dict = Depends(get_current_user)):
