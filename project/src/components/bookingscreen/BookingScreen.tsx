@@ -112,10 +112,19 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   const handleBooking = async () => {
     if (!selectedCourt || !selectedTime) return;
 
-    const horarioISO = new Date(
-      selectedDate.toDateString() + ' ' + selectedTime
-    ).toISOString();
+    const [year, month, day] = selectedDate.toISOString().split('T')[0].split('-');
+    const [hour, minute] = selectedTime.split(':');
 
+    const localDate = new Date(
+      Number(year),
+      Number(month) - 1, // meses começam em 0 no JS
+      Number(day),
+      Number(hour),
+      Number(minute),
+      0
+    );
+
+    const horarioISO = localDate.toISOString();
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`${backendUrl}/reserva`, {
