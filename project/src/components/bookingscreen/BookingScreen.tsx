@@ -110,45 +110,38 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   ];
 
   const handleBooking = async () => {
-    if (!selectedCourt || !selectedTime) return;
+  if (!selectedCourt || !selectedTime) return;
 
-    const [year, month, day] = selectedDate.toISOString().split('T')[0].split('-');
-    const [hour, minute] = selectedTime.split(':');
+  const [year, month, day] = selectedDate.toISOString().split('T')[0].split('-');
+  const [hour, minute] = selectedTime.split(':');
 
-    const localDate = new Date(
-      Number(year),
-      Number(month) - 1, // meses começam em 0 no JS
-      Number(day),
-      Number(hour),
-      Number(minute),
-      0
-    );
+  // monta o horário local manualmente
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  const horarioLocal = `${year}-${pad(Number(month))}-${pad(Number(day))}T${pad(Number(hour))}:${pad(Number(minute))}:00`;
 
-    const horarioISO = localDate.toISOString();
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${backendUrl}/reserva`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          quadra: selectedCourt.id,
-          horario: horarioISO
-        })
-      });
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${backendUrl}/reserva`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        quadra: selectedCourt.id,
+        horario: horarioLocal
+      })
+    });
 
-      if (!response.ok) {
-        throw new Error('Erro ao fazer reserva');
-      }
-
-      await response.json();
-      setShowModal(true);
-
-    } catch (error) {
-      alert('Erro ao confirmar reserva: ' + error);
+    if (!response.ok) {
+      throw new Error('Erro ao fazer reserva');
     }
+
+    await response.json();
+    setShowModal(true);
+  } catch (error) {
+    alert('Erro ao confirmar reserva: ' + error);
+  }
   };
 
   return (

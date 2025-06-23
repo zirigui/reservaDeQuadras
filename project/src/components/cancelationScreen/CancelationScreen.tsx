@@ -157,8 +157,8 @@ const CancellationScreen: React.FC<CancellationScreenProps> = ({ onNavigate }) =
       {showModal && (
               <ModalOverlay>
                 <ModalContent>
-                  <ModalTitle>Agendamento Confirmado!</ModalTitle>
-                  <ModalText>Sua quadra foi reservada com sucesso.</ModalText>
+                  <ModalTitle>Cancelamento Confirmado!</ModalTitle>
+                  <ModalText>Sua quadra foi cancelada com sucesso.</ModalText>
                   <ModalButton
                     onClick={() => {
                       setShowModal(false);
