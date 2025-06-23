@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {  Mail, Lock } from 'lucide-react';
+import { Mail, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import {
@@ -18,7 +18,6 @@ interface UserData {
   id: string;
   name: string;
   email: string;
-  access_token: string;
   admin: boolean;
 }
 
@@ -26,7 +25,7 @@ interface LoginProps {
   onLogin: (userData: UserData) => void;
 }
 
-const backendUrl = import.meta.env.VITE_API_URL
+const backendUrl = import.meta.env.VITE_API_URL;
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
   const navigate = useNavigate();
@@ -35,30 +34,30 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     try {
       const response = await fetch(`${backendUrl}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          email: email,
-          password,
-        }),
+        body: JSON.stringify({ email, password }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         localStorage.setItem('token', data.access_token);
-        localStorage.setItem('user', JSON.stringify({
+
+        const userData = {
           id: data.id,
           name: data.name,
           email: data.email,
-          admin: data.admin
-        }));
-        onLogin(data);
+          admin: data.admin,
+        };
+
+        localStorage.setItem('user', JSON.stringify(userData));
+        onLogin(userData);
         navigate('/');
       } else {
         alert(data.detail || 'Erro ao fazer login');
@@ -78,7 +77,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
       <Card>
         <Header>
           <IconContainer>
-          <img src="/logo.png" alt="Logo" className="w-32 h-32 object-contain" />
+            <img src="/logo.png" alt="Logo" className="w-32 h-32 object-contain" />
           </IconContainer>
           <h2>Bem-vindo</h2>
           <p>Faça login para agendar sua quadra</p>
@@ -120,7 +119,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           <Button type="submit">Entrar</Button>
         </form>
 
-        <Button type="button" onClick={handleRegisterClick} style={{ marginTop: '10px', backgroundColor: '#1d5a27' }}>
+        <Button
+          type="button"
+          onClick={handleRegisterClick}
+          style={{ marginTop: '10px', backgroundColor: '#1d5a27' }}
+        >
           Cadastrar-se
         </Button>
       </Card>
