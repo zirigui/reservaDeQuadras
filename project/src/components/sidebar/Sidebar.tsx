@@ -1,24 +1,23 @@
 import React from 'react';
 import {
-    SidebarContainer,
-    MenuItem,
-    FixedBottomButtons,
-    SettingsButton,
-    MenuGroup,
-    LogoutButton
-  } from './SidebarStyles';
-
+  SidebarContainer,
+  MenuItem,
+  FixedBottomButtons,
+  SettingsButton,
+  MenuGroup,
+  LogoutButton
+} from './SidebarStyles';
 
 interface SidebarProps {
   onNavigate: (screen: string) => void;
+  isAdmin: boolean;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ onNavigate }) => {
+const Sidebar: React.FC<SidebarProps> = ({ onNavigate, isAdmin }) => {
   return (
     <SidebarContainer>
-      
       <MenuGroup>
-        <MenuItem onClick={() => onNavigate('admin')}>Admin</MenuItem>
+        {isAdmin && <MenuItem onClick={() => onNavigate('admin')}>Admin</MenuItem>}
         <MenuItem onClick={() => onNavigate('notices')}>Avisos</MenuItem>
         <MenuItem onClick={() => onNavigate('booking')}>Reservar quadra</MenuItem>
         <MenuItem onClick={() => onNavigate('myBookings')}>Meus agendamentos</MenuItem>

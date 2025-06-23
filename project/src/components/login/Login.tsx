@@ -19,6 +19,7 @@ interface UserData {
   name: string;
   email: string;
   access_token: string;
+  admin: boolean;
 }
 
 interface LoginProps {
@@ -51,6 +52,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   
       if (response.ok) {
         localStorage.setItem('token', data.access_token);
+        localStorage.setItem('user', JSON.stringify({
+          id: data.id,
+          name: data.name,
+          email: data.email,
+          admin: data.admin
+        }));
         onLogin(data);
         navigate('/');
       } else {

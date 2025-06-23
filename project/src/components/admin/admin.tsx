@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   CourtCardContainer,
   CourtCard,
@@ -30,77 +31,76 @@ const backendUrl = import.meta.env.VITE_API_URL;
 
 const AdminScreen: React.FC = () => {
   const [courts, setCourts] = useState<Court[]>([]);
+  const [notices, setNotices] = useState<Notice[]>([]);
   const [newCourtName, setNewCourtName] = useState('');
   const [newCourtType, setNewCourtType] = useState('');
+  const [newNotice, setNewNotice] = useState('');
   const [editCourtId, setEditCourtId] = useState<number | null>(null);
   const [editCourtName, setEditCourtName] = useState('');
   const [editCourtType, setEditCourtType] = useState('');
-
-  const [notices, setNotices] = useState<Notice[]>([]);
-  const [newNotice, setNewNotice] = useState('');
   const [editNoticeId, setEditNoticeId] = useState<number | null>(null);
   const [editNoticeMessage, setEditNoticeMessage] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
   const token = localStorage.getItem('token');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser || !JSON.parse(storedUser).admin) {
+      navigate('/');
+      return;
+    }
+
+    loadCourts();
+    loadNotices();
+  }, []);
 
   const loadCourts = async () => {
     try {
-      const response = await fetch(`${backendUrl}/quadras`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await fetch(`${backendUrl}/quadras`, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      const data = await response.json();
+      const data = await res.json();
       if (Array.isArray(data)) setCourts(data);
-    } catch (error) {
-      console.error('Erro ao carregar quadras:', error);
+    } catch (err) {
+      console.error('Erro ao carregar quadras:', err);
     }
   };
 
   const loadNotices = async () => {
     try {
-      const response = await fetch(`${backendUrl}/avisos`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await fetch(`${backendUrl}/avisos`, {
+        headers: { Authorization: `Bearer ${token}` }
       });
-      const data = await response.json();
+      const data = await res.json();
       if (Array.isArray(data)) setNotices(data);
-    } catch (error) {
-      console.error('Erro ao carregar avisos:', error);
+    } catch (err) {
+      console.error('Erro ao carregar avisos:', err);
     }
   };
 
-  useEffect(() => {
-    loadCourts();
-    loadNotices();
-  }, []);
-
   const handleAddCourt = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCourtName || !newCourtType) {
-      alert('Preencha todos os campos da quadra');
-      return;
-    }
+    if (!newCourtName || !newCourtType) return;
     try {
-      const response = await fetch(`${backendUrl}/quadras`, {
+      const res = await fetch(`${backendUrl}/quadras`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ name: newCourtName, type: newCourtType }),
+        body: JSON.stringify({ name: newCourtName, type: newCourtType })
       });
-      if (response.ok) {
+      if (res.ok) {
         setNewCourtName('');
         setNewCourtType('');
         loadCourts();
         setModalMessage('Quadra cadastrada com sucesso!');
         setShowModal(true);
       }
-    } catch (error) {
-      console.error('Erro ao cadastrar quadra:', error);
+    } catch (err) {
+      console.error('Erro ao cadastrar quadra:', err);
     }
   };
 
@@ -110,87 +110,55 @@ const AdminScreen: React.FC = () => {
     setEditCourtType(court.type);
   };
 
-  const handleSaveEditCourt = async (courtId: number) => {
-    if (!editCourtName || !editCourtType) {
-      alert('Preencha todos os campos para editar a quadra.');
-      return;
-    }
-
+  const handleSaveEditCourt = async (id: number) => {
     try {
-      const response = await fetch(`${backendUrl}/quadras/${courtId}`, {
+      await fetch(`${backendUrl}/quadras/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ name: editCourtName, type: editCourtType }),
+        body: JSON.stringify({ name: editCourtName, type: editCourtType })
       });
-      if (response.ok) {
-        setEditCourtId(null);
-        setEditCourtName('');
-        setEditCourtType('');
-        loadCourts();
-        setModalMessage('Quadra atualizada com sucesso!');
-        setShowModal(true);
-      }
-    } catch (error) {
-      console.error('Erro ao atualizar quadra:', error);
+      setEditCourtId(null);
+      loadCourts();
+      setModalMessage('Quadra atualizada!');
+      setShowModal(true);
+    } catch (err) {
+      console.error('Erro ao atualizar quadra:', err);
     }
   };
 
   const handleDeleteCourt = async (id: number) => {
-    if (!confirm('Deseja mesmo excluir esta quadra?')) return;
+    if (!confirm('Tem certeza?')) return;
     try {
       await fetch(`${backendUrl}/quadras/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` }
       });
       loadCourts();
-    } catch (error) {
-      console.error('Erro ao excluir quadra:', error);
+    } catch (err) {
+      console.error('Erro ao excluir quadra:', err);
     }
   };
 
   const handleAddNotice = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newNotice) {
-      alert('Digite uma mensagem de aviso');
-      return;
-    }
     try {
-      const response = await fetch(`${backendUrl}/avisos`, {
+      await fetch(`${backendUrl}/avisos`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ message: newNotice }),
+        body: JSON.stringify({ message: newNotice })
       });
-      if (response.ok) {
-        setNewNotice('');
-        loadNotices();
-        setModalMessage('Aviso publicado com sucesso!');
-        setShowModal(true);
-      }
-    } catch (error) {
-      console.error('Erro ao publicar aviso:', error);
-    }
-  };
-
-  const handleDeleteNotice = async (id: number) => {
-    if (!confirm('Deseja mesmo excluir este aviso?')) return;
-    try {
-      await fetch(`${backendUrl}/avisos/${id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      setNewNotice('');
       loadNotices();
-    } catch (error) {
-      console.error('Erro ao excluir aviso:', error);
+      setModalMessage('Aviso publicado!');
+      setShowModal(true);
+    } catch (err) {
+      console.error('Erro ao publicar aviso:', err);
     }
   };
 
@@ -200,30 +168,35 @@ const AdminScreen: React.FC = () => {
   };
 
   const handleSaveEditNotice = async () => {
-    if (!editNoticeMessage.trim()) return;
     try {
-      const response = await fetch(`${backendUrl}/avisos/${editNoticeId}`, {
+      await fetch(`${backendUrl}/avisos/${editNoticeId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify({ message: editNoticeMessage }),
+        body: JSON.stringify({ message: editNoticeMessage })
       });
-      if (response.ok) {
-        setEditNoticeId(null);
-        setEditNoticeMessage('');
-        loadNotices();
-        setModalMessage('Aviso atualizado com sucesso!');
-        setShowModal(true);
-      }
-    } catch (error) {
-      console.error('Erro ao editar aviso:', error);
+      setEditNoticeId(null);
+      loadNotices();
+      setModalMessage('Aviso atualizado!');
+      setShowModal(true);
+    } catch (err) {
+      console.error('Erro ao editar aviso:', err);
     }
   };
 
-  const handleModalClose = () => {
-    setShowModal(false);
+  const handleDeleteNotice = async (id: number) => {
+    if (!confirm('Tem certeza?')) return;
+    try {
+      await fetch(`${backendUrl}/avisos/${id}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      loadNotices();
+    } catch (err) {
+      console.error('Erro ao excluir aviso:', err);
+    }
   };
 
   return (
@@ -239,7 +212,7 @@ const AdminScreen: React.FC = () => {
 
       <SectionTitle>Quadras Cadastradas</SectionTitle>
       <CourtCardContainer>
-        {courts.map((court) => (
+        {courts.map(court => (
           <CourtCard key={court.id}>
             {editCourtId === court.id ? (
               <CardContent>
@@ -248,8 +221,8 @@ const AdminScreen: React.FC = () => {
                 <Label>Tipo:</Label>
                 <Input value={editCourtType} onChange={(e) => setEditCourtType(e.target.value)} />
                 <ActionGroup>
-                  <Button onClick={() => handleSaveEditCourt(court.id)}>💾 Salvar</Button>
-                  <Button onClick={() => setEditCourtId(null)}>❌ Cancelar</Button>
+                  <Button onClick={() => handleSaveEditCourt(court.id)}>Salvar</Button>
+                  <Button onClick={() => setEditCourtId(null)}>Cancelar</Button>
                 </ActionGroup>
               </CardContent>
             ) : (
@@ -259,8 +232,8 @@ const AdminScreen: React.FC = () => {
                   <p>{court.type}</p>
                 </CardContent>
                 <ActionGroup>
-                  <Button onClick={() => handleEditCourt(court)}>✏️ Editar</Button>
-                  <Button onClick={() => handleDeleteCourt(court.id)}>🗑️ Excluir</Button>
+                  <Button onClick={() => handleEditCourt(court)}>Editar</Button>
+                  <Button onClick={() => handleDeleteCourt(court.id)}>Excluir</Button>
                 </ActionGroup>
               </>
             )}
@@ -277,7 +250,7 @@ const AdminScreen: React.FC = () => {
 
       <SectionTitle>Avisos Publicados</SectionTitle>
       <NoticeCardContainer>
-        {notices.map((notice) => (
+        {notices.map(notice => (
           <NoticeCard key={notice.id}>
             {editNoticeId === notice.id ? (
               <>
@@ -286,16 +259,16 @@ const AdminScreen: React.FC = () => {
                   onChange={(e) => setEditNoticeMessage(e.target.value)}
                 />
                 <ActionGroup>
-                  <Button onClick={handleSaveEditNotice}>💾 Salvar</Button>
-                  <Button onClick={() => setEditNoticeId(null)}>❌ Cancelar</Button>
+                  <Button onClick={handleSaveEditNotice}>Salvar</Button>
+                  <Button onClick={() => setEditNoticeId(null)}>Cancelar</Button>
                 </ActionGroup>
               </>
             ) : (
               <>
                 <p>{notice.message}</p>
                 <ActionGroup>
-                  <Button onClick={() => handleEditNotice(notice)}>✏️ Editar</Button>
-                  <Button onClick={() => handleDeleteNotice(notice.id)}>🗑️ Excluir</Button>
+                  <Button onClick={() => handleEditNotice(notice)}>Editar</Button>
+                  <Button onClick={() => handleDeleteNotice(notice.id)}>Excluir</Button>
                 </ActionGroup>
               </>
             )}
@@ -303,7 +276,7 @@ const AdminScreen: React.FC = () => {
         ))}
       </NoticeCardContainer>
 
-      {showModal && <Modal message={modalMessage} onClose={handleModalClose} />}
+      {showModal && <Modal message={modalMessage} onClose={() => setShowModal(false)} />}
     </div>
   );
 };

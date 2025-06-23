@@ -12,6 +12,7 @@ interface User {
   id: string;
   name: string;
   email: string;
+  admin: boolean;
 }
 
 function App() {
@@ -64,7 +65,8 @@ function App() {
       {user ? (
         <div className="min-h-screen flex">
           <div className="w-60 fixed h-screen bg-gray-800 text-white">
-            <Sidebar onNavigate={handleNavigate} />
+            <Sidebar onNavigate={handleNavigate} isAdmin={user.admin} />
+
           </div>
           <div className="ml-60 flex-1 p-4 bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen overflow-y-auto">
             <Routes>
