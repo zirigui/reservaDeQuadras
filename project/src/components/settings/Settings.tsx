@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, } from 'react';
 import {
   Container,
   Wrapper,
@@ -13,14 +13,21 @@ import {
 
 interface SettingsProps {
   onNavigate: (screen: string) => void;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    admin: boolean;
+  };
 }
 
 const backendUrl = import.meta.env.VITE_API_URL;
 const token = localStorage.getItem('token');
 
-const SettingsScreen: React.FC<SettingsProps> = ({ onNavigate }) => {
+const SettingsScreen: React.FC<SettingsProps> = ({ onNavigate, user }) => {
   const [receiveEmails, setReceiveEmails] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -28,10 +35,17 @@ const SettingsScreen: React.FC<SettingsProps> = ({ onNavigate }) => {
         const res = await fetch(`${backendUrl}/user/settings`, {
           headers: { Authorization: `Bearer ${token}` }
         });
+
+        if (!res.ok) {
+          throw new Error("Erro ao buscar configurações");
+        }
+
         const data = await res.json();
         setReceiveEmails(data.receive_notifications);
       } catch (err) {
         console.error("Erro ao carregar configurações", err);
+      } finally {
+        setLoading(false);
       }
     };
     loadSettings();
@@ -41,7 +55,7 @@ const SettingsScreen: React.FC<SettingsProps> = ({ onNavigate }) => {
     const newValue = !receiveEmails;
     setReceiveEmails(newValue);
     try {
-      await fetch(`${backendUrl}/user/settings`, {
+      const res = await fetch(`${backendUrl}/user/settings`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -49,11 +63,26 @@ const SettingsScreen: React.FC<SettingsProps> = ({ onNavigate }) => {
         },
         body: JSON.stringify({ receive_notifications: newValue })
       });
+
+      if (!res.ok) {
+        throw new Error("Erro ao atualizar configurações");
+      }
+
       setShowModal(true);
     } catch (err) {
       console.error("Erro ao atualizar configurações", err);
     }
   };
+
+  if (loading) {
+    return (
+      <Container>
+        <Wrapper>
+          <p>Carregando configurações...</p>
+        </Wrapper>
+      </Container>
+    );
+  }
 
   return (
     <Container>
