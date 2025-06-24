@@ -3,7 +3,6 @@ from .. import models, schemas, database
 from ..auth import get_current_user
 from datetime import datetime, timedelta
 from pytz import timezone
-from ..utils.sendgrid_email import send_reservation_email
 
 router = APIRouter()
 br_tz = timezone("America/Sao_Paulo")
@@ -49,12 +48,6 @@ def criar_reserva(reserva: schemas.Reserva, current_user: dict = Depends(get_cur
                 quadra_data = cur.fetchone()
                 quadra_nome = quadra_data[0] if quadra_data else "Quadra desconhecida"
 
-                send_reservation_email(
-                    to_email=email,
-                    user_name=username,
-                    horario=horario.strftime("%d/%m/%Y %H:%M"),
-                    quadra=quadra_nome
-                )
 
         return {"message": "Reserva criada com sucesso", "reserva_id": reserva_id}
     except Exception as e:
