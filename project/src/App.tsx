@@ -7,6 +7,8 @@ import Sidebar from './components/sidebar/Sidebar';
 import AdminScreen from './components/admin/admin';
 import CancellationScreen from './components/cancelationScreen/CancelationScreen';
 import NoticesScreen from './components/avisos/Avisos';
+import SettingsScreen from './components/settings/Settings';
+
 
 interface User {
   id: string;
@@ -73,7 +75,7 @@ function App() {
               <Route path="/admin" element={<AdminScreen />} />
               <Route path="/avisos" element={<NoticesScreen />} />
               <Route path="/my-bookings" element={<CancellationScreen onNavigate={handleNavigate} user={user} />} />
-              <Route path="/settings" element={<div>Configurações</div>} />
+              <Route path="/settings" element={<SettingsScreen onNavigate={handleNavigate} user={user} />} />
               <Route path="/login" element={<Navigate to="/" />} />
               <Route path="/register" element={<Navigate to="/" />} />
             </Routes>
