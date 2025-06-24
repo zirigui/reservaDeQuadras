@@ -48,7 +48,7 @@ def login(user: schemas.UserLogin):
             }
 
             token = auth.create_access_token(token_data)
-            return {"access_token": token, "token_type": "bearer", "admin": db_user[4],"id": db_user[0], "name": db_user[1]}
+            return {"access_token": token, "token_type": "bearer", "email": db_user[3], "admin": db_user[4],"id": db_user[0], "name": db_user[1]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro no login: {e}")
     finally:
