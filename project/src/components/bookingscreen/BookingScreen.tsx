@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { sendReservationEmail } from '../../utils/sendEmail';
 import {
   Container, Card, Header, Title,
   DateContainer, Content, CourtName,
@@ -146,6 +147,15 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
       }
 
       await response.json();
+          // envio do email
+    const formattedDate = `${day}/${month}/${year}`;
+    await sendReservationEmail(
+      user.name,
+      user.email,
+      selectedCourt.name,
+      formattedDate,
+      selectedTime
+    );
       setShowModal(true);
 
     } catch (error) {
