@@ -42,8 +42,6 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   const [courts, setCourts] = useState<Court[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [occupiedTimes, setOccupiedTimes] = useState<string[]>([]);
-  const now = new Date();
-  const isToday = selectedDate.toDateString() === now.toDateString();
 
   useEffect(() => {
     const fetchOccupiedTimes = async () => {
@@ -105,19 +103,28 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
     loadCourts();
   }, []);
 
-  const getFilteredTimeSlots = () => {
-    if (!isToday) return timeSlots;
+  const getDisabledTimes = () => {
+    const now = new Date();
+    const disabledTimes: string[] = [];
 
-    const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-    return timeSlots.filter((time) => {
-      const [hour, minute] = time.split(':').map(Number);
-      const slotDate = new Date(selectedDate);
-      slotDate.setHours(hour, minute, 0, 0);
-      return slotDate >= twoHoursLater;
-    });
+    if (selectedDate.toDateString() === now.toDateString()) {
+      const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+
+      timeSlots.forEach((time) => {
+        const [hour, minute] = time.split(':').map(Number);
+        const slotDate = new Date(selectedDate);
+        slotDate.setHours(hour, minute, 0, 0);
+
+        if (slotDate < twoHoursLater) {
+          disabledTimes.push(time);
+        }
+      });
+    }
+
+    return disabledTimes;
   };
 
-  const filteredTimeSlots = getFilteredTimeSlots();
+  const disabledTimes = getDisabledTimes();
 
   const timeSlots = [
     '08:00', '09:00', '10:00', '11:00', '12:00',
@@ -202,15 +209,18 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
           <TimeSection>
             <SectionTitle>Horários Disponíveis</SectionTitle>
             <TimeGrid>
-              {filteredTimeSlots.map((time) => {
+              {timeSlots.map((time) => {
                 const isOccupied = occupiedTimes.includes(time);
+                const isTooEarlyToday = disabledTimes.includes(time);
+                const isDisabled = isOccupied || isTooEarlyToday;
+
                 return (
                   <TimeButton
                     key={time}
-                    onClick={() => !isOccupied && setSelectedTime(time)}
+                    onClick={() => !isDisabled && setSelectedTime(time)}
                     selected={selectedTime === time}
-                    occupied={isOccupied}
-                    disabled={isOccupied}
+                    occupied={isDisabled}
+                    disabled={isDisabled}
                   >
                     {time}
                   </TimeButton>
