@@ -42,6 +42,8 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   const [courts, setCourts] = useState<Court[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [occupiedTimes, setOccupiedTimes] = useState<string[]>([]);
+  const isPastDate = selectedDate < new Date(new Date().setHours(0, 0, 0, 0));
+
 
   useEffect(() => {
     const fetchOccupiedTimes = async () => {
@@ -103,29 +105,6 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
     loadCourts();
   }, []);
 
-  const getDisabledTimes = () => {
-    const now = new Date();
-    const disabledTimes: string[] = [];
-
-    if (selectedDate.toDateString() === now.toDateString()) {
-      const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
-
-      timeSlots.forEach((time) => {
-        const [hour, minute] = time.split(':').map(Number);
-        const slotDate = new Date(selectedDate);
-        slotDate.setHours(hour, minute, 0, 0);
-
-        if (slotDate < twoHoursLater) {
-          disabledTimes.push(time);
-        }
-      });
-    }
-
-    return disabledTimes;
-  };
-
-  const disabledTimes = getDisabledTimes();
-
   const timeSlots = [
     '08:00', '09:00', '10:00', '11:00', '12:00',
     '13:00', '14:00', '15:00', '16:00', '17:00',
@@ -133,38 +112,45 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   ];
 
   const handleBooking = async () => {
-  if (!selectedCourt || !selectedTime) return;
+    if (!selectedCourt || !selectedTime) return;
 
-  const [year, month, day] = selectedDate.toISOString().split('T')[0].split('-');
-  const [hour, minute] = selectedTime.split(':');
+    const [year, month, day] = selectedDate.toISOString().split('T')[0].split('-');
+    const [hour, minute] = selectedTime.split(':');
 
-  // monta o horário local manualmente
-  const pad = (n: number) => n.toString().padStart(2, '0');
-  const horarioLocal = `${year}-${pad(Number(month))}-${pad(Number(day))}T${pad(Number(hour))}:${pad(Number(minute))}:00`;
+    const localDate = new Date(
+      Number(year),
+      Number(month) - 1, // meses começam em 0 no JS
+      Number(day),
+      Number(hour),
+      Number(minute),
+      0
+    );
 
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${backendUrl}/reserva`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
-      },
-      body: JSON.stringify({
-        quadra: selectedCourt.id,
-        horario: horarioLocal
-      })
-    });
+    const horarioISO = localDate.toISOString();
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${backendUrl}/reserva`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          quadra: selectedCourt.id,
+          horario: horarioISO
+        })
+      });
 
-    if (!response.ok) {
-      throw new Error('Erro ao fazer reserva');
+      if (!response.ok) {
+        throw new Error('Erro ao fazer reserva');
+      }
+
+      await response.json();
+      setShowModal(true);
+
+    } catch (error) {
+      alert('Erro ao confirmar reserva: ' + error);
     }
-
-    await response.json();
-    setShowModal(true);
-  } catch (error) {
-    alert('Erro ao confirmar reserva: ' + error);
-  }
   };
 
   return (
@@ -176,7 +162,6 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
             <input
               type="date"
               value={selectedDate.toISOString().split('T')[0]}
-              min={new Date().toISOString().split('T')[0]}
               onChange={(e) => setSelectedDate(new Date(e.target.value))}
             />
           </DateContainer>
@@ -211,9 +196,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
             <TimeGrid>
               {timeSlots.map((time) => {
                 const isOccupied = occupiedTimes.includes(time);
-                const isTooEarlyToday = disabledTimes.includes(time);
-                const isDisabled = isOccupied || isTooEarlyToday;
-
+                const isDisabled = isOccupied || isPastDate;
                 return (
                   <TimeButton
                     key={time}
@@ -233,7 +216,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
         <ActionButtonContainer>
           <ActionButton
             onClick={handleBooking}
-            disabled={!selectedCourt || !selectedTime}
+            disabled={!selectedCourt || !selectedTime || isPastDate}
           >
             Confirmar Agendamento
           </ActionButton>
