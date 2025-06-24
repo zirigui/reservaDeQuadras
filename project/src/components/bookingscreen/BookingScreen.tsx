@@ -45,11 +45,9 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   const [occupiedTimes, setOccupiedTimes] = useState<string[]>([]);
   const isPastDate = selectedDate < new Date(new Date().setHours(0, 0, 0, 0));
 
-
   useEffect(() => {
     const fetchOccupiedTimes = async () => {
       if (!selectedCourt) return;
-
       const token = localStorage.getItem('token');
       const dateStr = selectedDate.toISOString().split('T')[0];
 
@@ -57,29 +55,23 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
         const res = await fetch(`${backendUrl}/quadra/${selectedCourt.id}/horarios_ocupados?data=${dateStr}`, {
           headers: { Authorization: `Bearer ${token}` }
         });
-
         if (!res.ok) throw new Error('Erro ao buscar horários ocupados');
-
         const data = await res.json();
         setOccupiedTimes(data);
       } catch (error) {
         console.error('Erro:', error);
       }
     };
-
     fetchOccupiedTimes();
   }, [selectedCourt, selectedDate]);
-
 
   useEffect(() => {
     const loadCourts = async () => {
       const token = localStorage.getItem('token');
-
       try {
         const res = await fetch(`${backendUrl}/quadras`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         if (!res.ok) {
           if (res.status === 401) {
             localStorage.removeItem('token');
@@ -90,19 +82,16 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
             throw new Error('Erro ao carregar quadras');
           }
         }
-
         const data = await res.json();
         if (Array.isArray(data)) {
           setCourts(data);
         } else {
           console.error('Resposta inesperada do backend:', data);
         }
-
       } catch (error) {
         console.error('Erro ao buscar quadras:', error);
       }
     };
-
     loadCourts();
   }, []);
 
@@ -120,7 +109,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
 
     const localDate = new Date(
       Number(year),
-      Number(month) - 1, // meses começam em 0 no JS
+      Number(month) - 1,
       Number(day),
       Number(hour),
       Number(minute),
@@ -128,8 +117,19 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
     );
 
     const horarioISO = localDate.toISOString();
+
     try {
       const token = localStorage.getItem('token');
+
+      // 🔍 Verificar se o usuário quer receber e-mails
+      const settingsRes = await fetch(`${backendUrl}/user/settings`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const settings = await settingsRes.json();
+      const shouldSendEmail = settings.receive_notifications;
+
+      // 📝 Criar reserva
       const response = await fetch(`${backendUrl}/reserva`, {
         method: 'POST',
         headers: {
@@ -147,17 +147,20 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
       }
 
       await response.json();
-          // envio do email
-    const formattedDate = `${day}/${month}/${year}`;
-    await sendReservationEmail(
-      user.name,
-      user.email,
-      selectedCourt.name,
-      formattedDate,
-      selectedTime
-    );
-      setShowModal(true);
 
+      // 📧 Enviar email se estiver ativado
+      if (shouldSendEmail) {
+        const formattedDate = `${day}/${month}/${year}`;
+        await sendReservationEmail(
+          user.name,
+          user.email,
+          selectedCourt.name,
+          formattedDate,
+          selectedTime
+        );
+      }
+
+      setShowModal(true);
     } catch (error) {
       alert('Erro ao confirmar reserva: ' + error);
     }
