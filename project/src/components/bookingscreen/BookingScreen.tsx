@@ -42,6 +42,8 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
   const [courts, setCourts] = useState<Court[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [occupiedTimes, setOccupiedTimes] = useState<string[]>([]);
+  const now = new Date();
+  const isToday = selectedDate.toDateString() === now.toDateString();
 
   useEffect(() => {
     const fetchOccupiedTimes = async () => {
@@ -103,6 +105,20 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
     loadCourts();
   }, []);
 
+  const getFilteredTimeSlots = () => {
+    if (!isToday) return timeSlots;
+
+    const twoHoursLater = new Date(now.getTime() + 2 * 60 * 60 * 1000);
+    return timeSlots.filter((time) => {
+      const [hour, minute] = time.split(':').map(Number);
+      const slotDate = new Date(selectedDate);
+      slotDate.setHours(hour, minute, 0, 0);
+      return slotDate >= twoHoursLater;
+    });
+  };
+
+  const filteredTimeSlots = getFilteredTimeSlots();
+
   const timeSlots = [
     '08:00', '09:00', '10:00', '11:00', '12:00',
     '13:00', '14:00', '15:00', '16:00', '17:00',
@@ -153,6 +169,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
             <input
               type="date"
               value={selectedDate.toISOString().split('T')[0]}
+              min={new Date().toISOString().split('T')[0]}
               onChange={(e) => setSelectedDate(new Date(e.target.value))}
             />
           </DateContainer>
@@ -185,7 +202,7 @@ const BookingScreen: React.FC<BookingScreenProps> = ({ onNavigate, user }) => {
           <TimeSection>
             <SectionTitle>Horários Disponíveis</SectionTitle>
             <TimeGrid>
-              {timeSlots.map((time) => {
+              {filteredTimeSlots.map((time) => {
                 const isOccupied = occupiedTimes.includes(time);
                 return (
                   <TimeButton
