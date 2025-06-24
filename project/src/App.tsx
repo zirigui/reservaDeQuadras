@@ -49,7 +49,6 @@ function App() {
     if (screen === 'settings') window.location.href = '/settings';
     if (screen === 'admin') window.location.href = '/admin';
     if (screen === 'notices') window.location.href = '/avisos';
-    if (screen === 'notifications') window.location.href = '/notifications';
   };
 
   if (loading) {

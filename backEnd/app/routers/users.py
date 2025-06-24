@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from .. import models, schemas, auth, database
+from ..auth import get_current_user
 
 router = APIRouter()
 
@@ -50,5 +51,29 @@ def login(user: schemas.UserLogin):
             return {"access_token": token, "token_type": "bearer", "admin": db_user[4],"id": db_user[0], "name": db_user[1]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro no login: {e}")
+    finally:
+        conn.close()
+
+@router.get("/user/settings")
+def get_settings(current_user: dict = Depends(get_current_user)):
+    conn = database.get_db_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT receive_notifications FROM users WHERE id = %s", (current_user["id"],))
+            result = cur.fetchone()
+            return {"receive_notifications": result[0] if result else True}
+    finally:
+        conn.close()
+
+@router.put("/user/settings")
+def update_settings(settings: schemas.UserSettings, current_user: dict = Depends(get_current_user)):
+    conn = database.get_db_connection()
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                UPDATE users SET receive_notifications = %s WHERE id = %s
+            """, (settings.receive_notifications, current_user["id"]))
+            conn.commit()
+        return {"message": "Configurações atualizadas com sucesso"}
     finally:
         conn.close()

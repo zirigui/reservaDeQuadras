@@ -3,6 +3,7 @@ from .. import models, schemas, database
 from ..auth import get_current_user
 from datetime import datetime, timedelta
 from pytz import timezone
+from ..utils.sendgrid_email import send_reservation_email
 
 router = APIRouter()
 br_tz = timezone("America/Sao_Paulo")
@@ -28,6 +29,7 @@ def criar_reserva(reserva: schemas.Reserva, current_user: dict = Depends(get_cur
             horario = horario.astimezone(br_tz)
 
         with conn.cursor() as cur:
+            # Insere a reserva
             cur.execute("""
                 INSERT INTO reservas (quadra, horario, user_id) 
                 VALUES (%s, %s, %s) RETURNING id
@@ -35,12 +37,32 @@ def criar_reserva(reserva: schemas.Reserva, current_user: dict = Depends(get_cur
             reserva_id = cur.fetchone()[0]
             conn.commit()
 
+        # Buscar dados do usuário e da quadra para o e-mail
+        with conn.cursor() as cur:
+            cur.execute("SELECT email, username, receive_notifications FROM users WHERE id = %s", (current_user["id"],))
+            user_data = cur.fetchone()
+
+            if user_data and user_data[2]:  # receive_notifications é True
+                email, username = user_data[0], user_data[1]
+
+                cur.execute("SELECT name FROM quadras WHERE id = %s", (reserva.quadra,))
+                quadra_data = cur.fetchone()
+                quadra_nome = quadra_data[0] if quadra_data else "Quadra desconhecida"
+
+                send_reservation_email(
+                    to_email=email,
+                    user_name=username,
+                    horario=horario.strftime("%d/%m/%Y %H:%M"),
+                    quadra=quadra_nome
+                )
+
         return {"message": "Reserva criada com sucesso", "reserva_id": reserva_id}
     except Exception as e:
         conn.rollback()
         raise HTTPException(status_code=500, detail=f"Erro ao criar reserva: {e}")
     finally:
         conn.close()
+
 
 @router.get("/quadra/{quadra_id}/horarios_ocupados")
 def horarios_ocupados(quadra_id: int, data: str, current_user: dict = Depends(get_current_user)):
@@ -56,6 +78,7 @@ def horarios_ocupados(quadra_id: int, data: str, current_user: dict = Depends(ge
         return [h[0].astimezone(br_tz).strftime("%H:%M") for h in horarios]
     finally:
         conn.close()
+
 
 @router.get("/reservas")
 def listar_reservas(current_user: dict = Depends(get_current_user)):
@@ -88,6 +111,7 @@ def listar_reservas(current_user: dict = Depends(get_current_user)):
         return result
     finally:
         conn.close()
+
 
 @router.delete("/reserva/{reserva_id}")
 def cancelar_reserva(reserva_id: int, current_user: dict = Depends(get_current_user)):

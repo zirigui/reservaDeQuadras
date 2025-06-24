@@ -21,7 +21,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onNavigate, isAdmin }) => {
         <MenuItem onClick={() => onNavigate('notices')}>Avisos</MenuItem>
         <MenuItem onClick={() => onNavigate('booking')}>Reservar quadra</MenuItem>
         <MenuItem onClick={() => onNavigate('myBookings')}>Meus agendamentos</MenuItem>
-        <MenuItem onClick={() => onNavigate('notifications')}>Notificações</MenuItem>
       </MenuGroup>
       <FixedBottomButtons>
         <SettingsButton onClick={() => onNavigate('settings')}>Configurações</SettingsButton>

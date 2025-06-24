@@ -31,3 +31,6 @@ class AvisoCreate(BaseModel):
 
 class Aviso(AvisoCreate):
     id: int
+
+class UserSettings(BaseModel):
+    receive_notifications: bool
